@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { MENU_ITEMS } from './data';
 import type { MenuItem, TransitionPhase } from './types';
@@ -38,7 +38,7 @@ export default function App() {
   const currentItem = MENU_ITEMS.find(m => m.id === routeId) ?? null;
   const PageComp = !isMenu ? PAGES[routeId] : null;
 
-  function go(targetPath: string) {
+  const go = useCallback((targetPath: string) => {
     if (pending) return;
     const targetId = targetPath === '/' ? 'menu' : targetPath.slice(1);
     const item = targetId === 'menu'
@@ -47,7 +47,7 @@ export default function App() {
     if (!item) return;
     setPending(targetPath);
     setTrans({ kind: targetId === 'menu' ? 'iris' : item.transition, color: item.color, phase: 'cover' });
-  }
+  }, [pending]);
 
   function onCoverDone() {
     navigate(pending!);
@@ -66,7 +66,7 @@ export default function App() {
     }
     window.addEventListener('keydown', onKey);
     return () => window.removeEventListener('keydown', onKey);
-  }, [isMenu, pending]);
+  }, [go, isMenu, pending]);
 
   return (
     <div className="relative w-full h-full overflow-hidden" style={{ background: '#05102a', color: '#f3f7ff' }}>

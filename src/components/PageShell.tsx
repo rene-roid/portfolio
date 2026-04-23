@@ -61,7 +61,7 @@ export function PageShell({ item, onBack, children }: {
 }) {
   return (
     <div className="absolute inset-0 z-[3]">
-      <BackgroundField hue={item.hue as any} />
+      <BackgroundField hue={item.hue} />
 
       <Reveal delay={60} from="down" dist={60}>
         <EdgeText side="left" text={item.label} color={item.color} />

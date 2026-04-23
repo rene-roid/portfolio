@@ -1,6 +1,5 @@
 import React from 'react';
-
-type Hue = 'blue' | 'crimson' | 'violet' | 'teal' | 'amber' | 'ink';
+import type { Hue } from '../types';
 
 const HUE_MAP: Record<Hue, [string, string]> = {
   blue:    ['#0a1b3d', '#05102a'],

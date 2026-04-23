@@ -1,9 +1,11 @@
+export type Hue = 'blue' | 'crimson' | 'violet' | 'teal' | 'amber' | 'ink';
+
 export interface MenuItem {
   id: string;
   label: string;
   sub: string;
   color: string;
-  hue: string;
+  hue: Hue;
   transition: string;
   command: string;
 }

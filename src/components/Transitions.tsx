@@ -10,7 +10,7 @@ function SlashTransition({ color, phase, onDone }: TransitionProps) {
     requestAnimationFrame(() => setT(1));
     const id = setTimeout(onDone, 380);
     return () => clearTimeout(id);
-  }, []);
+  }, [onDone]);
   const covering = phase === 'cover';
   return (
     <div className="fixed inset-0 z-[100] pointer-events-none">
@@ -36,7 +36,7 @@ function BarsTransition({ color, phase, onDone }: TransitionProps) {
     requestAnimationFrame(() => setT(1));
     const id = setTimeout(onDone, 500);
     return () => clearTimeout(id);
-  }, []);
+  }, [onDone]);
   const covering = phase === 'cover';
   const N = 8;
   return (
@@ -57,13 +57,13 @@ function BarsTransition({ color, phase, onDone }: TransitionProps) {
   );
 }
 
-function GlitchTransition({ color: _color, phase, onDone }: TransitionProps) {
+function GlitchTransition({ phase, onDone }: TransitionProps) {
   const [t, setT] = useState(0);
   useEffect(() => {
     requestAnimationFrame(() => setT(1));
     const id = setTimeout(onDone, 520);
     return () => clearTimeout(id);
-  }, []);
+  }, [onDone]);
   const covering = phase === 'cover';
   const slabs = [
     { c: '#ff3b8a', d: -8, off: -3 },
@@ -98,7 +98,7 @@ function IrisTransition({ color, phase, onDone }: TransitionProps) {
     requestAnimationFrame(() => setT(1));
     const id = setTimeout(onDone, 500);
     return () => clearTimeout(id);
-  }, []);
+  }, [onDone]);
   const covering = phase === 'cover';
   const r = covering ? (t ? 180 : 0) : (t ? 0 : 180);
   return (
@@ -126,7 +126,7 @@ function StripeTransition({ color, phase, onDone }: TransitionProps) {
     requestAnimationFrame(() => setT(1));
     const id = setTimeout(onDone, 520);
     return () => clearTimeout(id);
-  }, []);
+  }, [onDone]);
   const covering = phase === 'cover';
   const N = 14;
   return (

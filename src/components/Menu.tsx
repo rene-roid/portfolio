@@ -219,7 +219,7 @@ export function MainMenu({ onSelect }: { onSelect: (item: MenuItem) => void }) {
 
   return (
     <div ref={containerRef} className="absolute inset-0 z-[3]" tabIndex={-1}>
-      <BackgroundField hue={(current?.hue as any) ?? 'blue'} />
+      <BackgroundField hue={current?.hue ?? 'blue'} />
 
       <EdgeText side="left" text="FRAGMENT·0426" color="#ffffff" />
       <EdgeText side="right" text={current ? current.command.toUpperCase().replace(/ /g, '·') : 'MAIN·MENU'} color={current?.color ?? '#4fd6ff'} />
