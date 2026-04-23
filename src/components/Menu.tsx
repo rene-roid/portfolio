@@ -16,7 +16,7 @@ function IntroPanel({ hoveredItem }: { hoveredItem: MenuItem | null }) {
   const accent = hoveredItem?.color ?? '#4fd6ff';
 
   return (
-    <div className="absolute z-[4]" style={{ left: '6%', top: '50%', transform: 'translateY(-50%)', maxWidth: '44%' }}>
+    <div className="absolute z-4" style={{ left: '6%', top: '50%', transform: 'translateY(-50%)', maxWidth: '44%' }}>
       {/* // hello_world() */}
       <div className="font-mono uppercase" style={{
         opacity: step >= 1 ? 1 : 0,
@@ -168,7 +168,7 @@ function MenuItemRow({ item, index, isActive, onHover, onClick }: {
       </div>
 
       {/* subtitle badge */}
-      {/* <div className="absolute font-mono uppercase z-[2] whitespace-nowrap" style={{
+      {/* <div className="absolute font-mono uppercase z-2 whitespace-nowrap" style={{
         right: -8, top: '50%',
         transform: `translateY(-50%) translateX(${isActive ? 0 : 20}px)`,
         opacity: isActive ? 1 : 0,
@@ -228,7 +228,7 @@ export function MainMenu({ onSelect }: { onSelect: (item: MenuItem) => void }) {
   const current = MENU_ITEMS.find(i => i.id === activeId) ?? null;
 
   return (
-    <div ref={containerRef} className="absolute inset-0 z-[3]" tabIndex={-1}>
+    <div ref={containerRef} className="absolute inset-0 z-3" tabIndex={-1}>
       <BackgroundField hue={current?.hue ?? 'blue'} accentColor={current?.color ?? '#4fd6ff'} />
 
       <EdgeText side="left" text="FRAGMENT·0426" color="#ffffff" />
@@ -249,7 +249,7 @@ export function MainMenu({ onSelect }: { onSelect: (item: MenuItem) => void }) {
       <IntroPanel hoveredItem={current} />
 
       {/* right: menu stack */}
-      <div className="absolute flex flex-col items-start z-[4]" style={{ right: '6%', top: '50%', transform: 'translateY(-50%)' }}>
+      <div className="absolute flex flex-col items-start z-4" style={{ right: '6%', top: '50%', transform: 'translateY(-50%)' }}>
         <div className="relative" style={{ marginLeft: 0, marginBottom: 8, transform: 'skewX(-8deg)' }}>
           <div className="absolute" style={{
             left: -20, right: -30, top: '42%', height: '28%',
@@ -258,7 +258,7 @@ export function MainMenu({ onSelect }: { onSelect: (item: MenuItem) => void }) {
             transition: 'background 200ms',
             zIndex: 0,
           }} />
-          <div className="relative font-display italic z-[1]" style={{
+          <div className="relative font-display italic z-1" style={{
             fontSize: 'clamp(56px, 8vw, 120px)', lineHeight: 0.9,
             letterSpacing: '-0.04em', color: '#ffffff',
             textShadow: '5px 5px 0 rgba(0,0,0,0.35)',

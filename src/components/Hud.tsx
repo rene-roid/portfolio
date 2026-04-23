@@ -36,6 +36,7 @@ function AudioVisualizer({ analyser, colorRef }: {
     let frameId: number;
 
     function resize() {
+      if (!canvas) return;
       canvas.width = canvas.offsetWidth;
       canvas.height = canvas.offsetHeight;
     }
@@ -47,6 +48,7 @@ function AudioVisualizer({ analyser, colorRef }: {
       frameId = requestAnimationFrame(draw);
       analyser.getByteFrequencyData(bins);
 
+      if (!canvas) return;
       const w = canvas.width;
       const h = canvas.height;
       ctx.clearRect(0, 0, w, h);
@@ -183,7 +185,7 @@ export function CornerBracket({ corner, children }: {
     bl: { bottom: 24, left: 24 },
     br: { bottom: 24, right: 24 },
   }[corner];
-  return <div className="absolute z-[5]" style={pos}>{children}</div>;
+  return <div className="absolute z-5" style={pos}>{children}</div>;
 }
 
 export function HudBadge({ label, value, accent = '#4fd6ff' }: {
@@ -235,7 +237,7 @@ export function NowPlayingPlayer({ label, value, accent }: {
       <div className="flex items-center gap-2" style={{ marginTop: 5 }}>
         <button
           onClick={toggle}
-          className="inline-flex items-center justify-center flex-shrink-0"
+          className="inline-flex items-center justify-center shrink-0"
           style={{
             width: 20, height: 20, borderRadius: '50%',
             border: `1.5px solid ${accent}`,
@@ -313,7 +315,7 @@ export function ScreenLabel({ command, hint }: { command: string; hint: string }
 
 export function PortraitPlaceholder({ accent = '#4fd6ff' }: { accent?: string }) {
   return (
-    <div className="absolute pointer-events-none z-[1]" style={{ left: '2%', bottom: 0, top: '10%', width: '46%' }}>
+    <div className="absolute pointer-events-none z-1" style={{ left: '2%', bottom: 0, top: '10%', width: '46%' }}>
       <div className="absolute" style={{
         left: '20%', top: '5%', width: '60%', height: '90%',
         background: `linear-gradient(170deg, ${accent}33 0%, ${accent}11 40%, transparent 70%)`,

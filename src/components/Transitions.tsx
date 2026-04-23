@@ -13,7 +13,7 @@ function SlashTransition({ color, phase, onDone }: TransitionProps) {
   }, [onDone]);
   const covering = phase === 'cover';
   return (
-    <div className="fixed inset-0 z-[100] pointer-events-none">
+    <div className="fixed inset-0 z-100 pointer-events-none">
       <div style={{
         position: 'absolute', width: '160%', height: '60%',
         left: '-30%', top: '-10%', background: color,
@@ -40,7 +40,7 @@ function BarsTransition({ color, phase, onDone }: TransitionProps) {
   const covering = phase === 'cover';
   const N = 8;
   return (
-    <div className="fixed inset-0 z-[100] pointer-events-none flex flex-col">
+    <div className="fixed inset-0 z-100 pointer-events-none flex flex-col">
       {Array.from({ length: N }).map((_, i) => {
         const dir = i % 2 === 0 ? 1 : -1;
         const delay = i * 30;
@@ -71,7 +71,7 @@ function GlitchTransition({ phase, onDone }: TransitionProps) {
     { c: '#ffd23f', d: 8,  off: 3  },
   ];
   return (
-    <div className="fixed inset-0 z-[100] pointer-events-none" style={{ mixBlendMode: 'screen' }}>
+    <div className="fixed inset-0 z-100 pointer-events-none" style={{ mixBlendMode: 'screen' }}>
       {slabs.map((s, i) => {
         const y = covering ? (t ? 0 : -110) : (t ? -110 : 0);
         return (
@@ -102,7 +102,7 @@ function IrisTransition({ color, phase, onDone }: TransitionProps) {
   const covering = phase === 'cover';
   const r = covering ? (t ? 180 : 0) : (t ? 0 : 180);
   return (
-    <div className="fixed inset-0 z-[100] pointer-events-none">
+    <div className="fixed inset-0 z-100 pointer-events-none">
       <div className="absolute" style={{
         left: '50%', top: '50%', width: '10vmax', height: '10vmax',
         transform: `translate(-50%,-50%) scale(${r / 10})`,
@@ -130,7 +130,7 @@ function StripeTransition({ color, phase, onDone }: TransitionProps) {
   const covering = phase === 'cover';
   const N = 14;
   return (
-    <div className="fixed inset-0 z-[100] pointer-events-none flex">
+    <div className="fixed inset-0 z-100 pointer-events-none flex">
       {Array.from({ length: N }).map((_, i) => {
         const dir = i % 2 === 0 ? -1 : 1;
         const delay = Math.abs(i - N / 2) * 18;
@@ -161,7 +161,7 @@ function VeilTransition({ color, phase, onDone }: TransitionProps) {
   const N = 14;
 
   return (
-    <div className="fixed inset-0 z-[100] pointer-events-none flex">
+    <div className="fixed inset-0 z-100 pointer-events-none flex">
       {Array.from({ length: N }).map((_, i) => {
         const delay = i * 28;
         const y = covering ? (t ? '0%' : '-105%') : (t ? '-105%' : '0%');

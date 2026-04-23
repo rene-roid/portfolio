@@ -59,7 +59,7 @@ function NavArrow({ dir, onClick, color }: { dir: 'prev' | 'next'; onClick: () =
   return (
     <button
       onClick={onClick}
-      className="absolute z-[5] flex flex-col items-center gap-1 cursor-pointer"
+      className="absolute z-5 flex flex-col items-center gap-1 cursor-pointer"
       style={{
         [isPrev ? 'left' : 'right']: 18,
         top: '50%',
@@ -99,7 +99,7 @@ export function PageShell({ item, onBack, onNext, onPrev, children }: {
   children: React.ReactNode;
 }) {
   return (
-    <div className="absolute inset-0 z-[3]">
+    <div className="absolute inset-0 z-3">
       <BackgroundField hue={item.hue} accentColor={item.color} />
 
       <Reveal delay={60} from="down" dist={60}>
@@ -121,7 +121,7 @@ export function PageShell({ item, onBack, onNext, onPrev, children }: {
         </Reveal>
       </CornerBracket>
 
-      <div className="absolute overflow-hidden z-[4]" style={{ inset: '110px 8% 110px 8%' }}>
+      <div className="absolute overflow-hidden z-4" style={{ inset: '110px 8% 110px 8%' }}>
         <Reveal delay={220} from="up" dist={40} dur={480}>
           {children}
         </Reveal>
