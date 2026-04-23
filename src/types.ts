@@ -19,3 +19,10 @@ export interface TransitionProps {
 }
 
 export type Route = 'menu' | 'about' | 'work' | 'skills' | 'writing' | 'lab' | 'contact';
+
+export interface PageProps {
+  item: MenuItem;
+  onBack: () => void;
+  onNext?: () => void;
+  onPrev?: () => void;
+}

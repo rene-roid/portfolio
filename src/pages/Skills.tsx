@@ -1,10 +1,10 @@
-import type { MenuItem } from '../types';
+import type { PageProps } from '../types';
 import { SKILL_GROUPS } from '../data';
 import { PageShell } from '../components/PageShell';
 
-export function SkillsPage({ item, onBack }: { item: MenuItem; onBack: () => void }) {
+export function SkillsPage({ item, onBack, onNext, onPrev }: PageProps) {
   return (
-    <PageShell item={item} onBack={onBack}>
+    <PageShell item={item} onBack={onBack} onNext={onNext} onPrev={onPrev}>
       <div className="flex flex-col h-full gap-6">
         <div>
           <div className="font-mono uppercase" style={{ fontSize: 11, letterSpacing: '0.28em', opacity: 0.7 }}>

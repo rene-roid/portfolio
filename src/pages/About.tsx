@@ -1,9 +1,9 @@
-import type { MenuItem } from "../types";
+import type { PageProps } from "../types";
 import { PageShell, StyledCard } from "../components/PageShell";
 
-export function AboutPage({ item, onBack }: { item: MenuItem; onBack: () => void }) {
+export function AboutPage({ item, onBack, onNext, onPrev }: PageProps) {
   return (
-    <PageShell item={item} onBack={onBack}>
+    <PageShell item={item} onBack={onBack} onNext={onNext} onPrev={onPrev}>
       <div className="grid gap-10 h-full" style={{ gridTemplateColumns: '1.1fr 1fr' }}>
         <div className="relative">
           <div className="font-mono uppercase" style={{ fontSize: 11, letterSpacing: '0.28em', opacity: 0.7 }}>

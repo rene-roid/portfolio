@@ -1,4 +1,4 @@
-import type { MenuItem } from '../types';
+import type { PageProps } from '../types';
 import { EXPERIENCE } from '../data';
 import { PageShell, StyledCard } from '../components/PageShell';
 
@@ -41,9 +41,9 @@ function getJobPeriodLabel(job: { start?: string | null; end?: string | null; pe
   return `${range} · ${formatDuration(totalMonths)}`;
 }
 
-export function ExperiencePage({ item, onBack }: { item: MenuItem; onBack: () => void }) {
+export function ExperiencePage({ item, onBack, onNext, onPrev }: PageProps) {
   return (
-    <PageShell item={item} onBack={onBack}>
+    <PageShell item={item} onBack={onBack} onNext={onNext} onPrev={onPrev}>
       <div className="grid gap-10 h-full" style={{ gridTemplateColumns: '1fr 1fr' }}>
         <div className="flex flex-col gap-3">
           <div className="font-mono uppercase" style={{ fontSize: 11, letterSpacing: '0.28em', opacity: 0.7, marginBottom: 4 }}>

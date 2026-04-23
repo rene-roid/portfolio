@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import type { MenuItem } from "../types";
+import type { PageProps } from "../types";
 import { PageShell } from "../components/PageShell";
 
 function inputStyle(accent: string): React.CSSProperties {
@@ -11,12 +11,12 @@ function inputStyle(accent: string): React.CSSProperties {
   };
 }
 
-export function ContactPage({ item, onBack }: { item: MenuItem; onBack: () => void }) {
+export function ContactPage({ item, onBack, onNext, onPrev }: PageProps) {
   const [form, setForm] = useState({ name: '', org: '', msg: '' });
   const [sent, setSent] = useState(false);
 
   return (
-    <PageShell item={item} onBack={onBack}>
+    <PageShell item={item} onBack={onBack} onNext={onNext} onPrev={onPrev}>
       <div className="grid gap-16 h-full items-center" style={{ gridTemplateColumns: '1fr 1fr' }}>
         <div>
           <div className="font-mono uppercase" style={{ fontSize: 11, letterSpacing: '0.28em', opacity: 0.7 }}>

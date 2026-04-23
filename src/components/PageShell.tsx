@@ -54,9 +54,48 @@ export function StyledCard({ accent = '#4fd6ff', children, pad = 20, style }: {
   );
 }
 
-export function PageShell({ item, onBack, children }: {
+function NavArrow({ dir, onClick, color }: { dir: 'prev' | 'next'; onClick: () => void; color: string }) {
+  const isPrev = dir === 'prev';
+  return (
+    <button
+      onClick={onClick}
+      className="absolute z-[5] flex flex-col items-center gap-1 cursor-pointer"
+      style={{
+        [isPrev ? 'left' : 'right']: 18,
+        top: '50%',
+        transform: 'translateY(-50%)',
+        background: 'transparent',
+        border: 'none',
+        padding: '12px 8px',
+        opacity: 0.45,
+        transition: 'opacity 150ms',
+      }}
+      onMouseEnter={e => { (e.currentTarget as HTMLButtonElement).style.opacity = '1'; }}
+      onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.opacity = '0.45'; }}
+    >
+      <div className="font-display italic" style={{
+        fontSize: 28,
+        color,
+        transform: isPrev ? 'rotate(90deg)' : 'rotate(-90deg)',
+        lineHeight: 1,
+      }}>▼</div>
+      <div className="font-mono uppercase" style={{
+        fontSize: 9, letterSpacing: '0.25em', color: '#fff',
+        writingMode: 'vertical-rl',
+        transform: isPrev ? 'rotate(180deg)' : 'none',
+        marginTop: 4,
+      }}>
+        {isPrev ? 'PREV' : 'NEXT'}
+      </div>
+    </button>
+  );
+}
+
+export function PageShell({ item, onBack, onNext, onPrev, children }: {
   item: MenuItem;
   onBack: () => void;
+  onNext?: () => void;
+  onPrev?: () => void;
   children: React.ReactNode;
 }) {
   return (
@@ -88,11 +127,15 @@ export function PageShell({ item, onBack, children }: {
         </Reveal>
       </div>
 
+      {onPrev && <NavArrow dir="prev" onClick={onPrev} color={item.color} />}
+      {onNext && <NavArrow dir="next" onClick={onNext} color={item.color} />}
+
       <CornerBracket corner="br">
         <Reveal delay={260} from="right">
           <ScreenLabel command="Return" hint="Main Menu" />
           <div className="text-right" style={{ marginTop: 14 }}>
             <HudControlHint keyLabel="ESC" action="Back" />
+            <HudControlHint keyLabel="SCROLL" action="Navigate" />
           </div>
         </Reveal>
       </CornerBracket>

@@ -147,12 +147,52 @@ function StripeTransition({ color, phase, onDone }: TransitionProps) {
   );
 }
 
+// Falling dark strips with glowing leading edge — used for returning to main menu.
+// Avoids the bright iris flashbang; gives a "closing down" digital-curtain feel.
+function VeilTransition({ color, phase, onDone }: TransitionProps) {
+  const [t, setT] = useState(0);
+  useEffect(() => {
+    requestAnimationFrame(() => setT(1));
+    const id = setTimeout(onDone, 650);
+    return () => clearTimeout(id);
+  }, [onDone]);
+
+  const covering = phase === 'cover';
+  const N = 8;
+
+  return (
+    <div className="fixed inset-0 z-[100] pointer-events-none flex">
+      {Array.from({ length: N }).map((_, i) => {
+        const delay = i * 40;
+        const y = covering ? (t ? '0%' : '-105%') : (t ? '-105%' : '0%');
+        return (
+          <div key={i} style={{
+            width: `${100 / N + 0.5}%`,
+            flexShrink: 0,
+            background: color,
+            transform: `translateY(${y})`,
+            transition: `transform 480ms cubic-bezier(.76,0,.24,1) ${delay}ms`,
+          }} />
+        );
+      })}
+      {/* Subtle scanline overlay while covered */}
+      <div className="absolute inset-0" style={{
+        // backgroundImage: 'repeating-linear-gradient(0deg, rgba(0,0,0,0.18) 0 1px, transparent 1px 3px)',
+        opacity: covering ? (t ? 0.7 : 0) : (t ? 0 : 0.7),
+        transition: 'opacity 300ms 200ms',
+        pointerEvents: 'none',
+      }} />
+    </div>
+  );
+}
+
 const TRANSITIONS: Record<string, React.ComponentType<TransitionProps>> = {
   slash:  SlashTransition,
   bars:   BarsTransition,
   glitch: GlitchTransition,
   iris:   IrisTransition,
   stripe: StripeTransition,
+  veil:   VeilTransition,
 };
 
 export function Transition({ kind, color, phase, onDone }: TransitionProps & { kind: string }) {

@@ -1,7 +1,7 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { MENU_ITEMS } from './data';
-import type { MenuItem, TransitionPhase } from './types';
+import type { MenuItem, PageProps, TransitionPhase } from './types';
 import { MainMenu } from './components/Menu';
 import { Transition } from './components/Transitions';
 import { AboutPage } from './pages/About';
@@ -16,7 +16,7 @@ interface TransState {
   phase: TransitionPhase;
 }
 
-const PAGES: Record<string, React.ComponentType<{ item: MenuItem; onBack: () => void }>> = {
+const PAGES: Record<string, React.ComponentType<PageProps>> = {
   about:      AboutPage,
   experience: ExperiencePage,
   skills:     SkillsPage,
@@ -24,11 +24,14 @@ const PAGES: Record<string, React.ComponentType<{ item: MenuItem; onBack: () => 
   contact:    ContactPage,
 };
 
+const NAV_ORDER = ['menu', 'about', 'experience', 'projects', 'skills', 'contact'];
+
 export default function App() {
   const navigate = useNavigate();
   const location = useLocation();
   const [pending, setPending] = useState<string | null>(null);
   const [trans, setTrans] = useState<TransState | null>(null);
+  const wheelLock = useRef(false);
 
   const pathname = location.pathname;
   const routeId = pathname === '/' ? 'menu' : pathname.slice(1);
@@ -40,12 +43,42 @@ export default function App() {
     if (pending) return;
     const targetId = targetPath === '/' ? 'menu' : targetPath.slice(1);
     const item = targetId === 'menu'
-      ? { transition: 'iris', color: '#4fd6ff' }
+      ? { transition: 'veil', color: '#4fd6ff' }
       : MENU_ITEMS.find(m => m.id === targetId);
     if (!item) return;
     setPending(targetPath);
-    setTrans({ kind: targetId === 'menu' ? 'iris' : item.transition, color: item.color, phase: 'cover' });
+    setTrans({ kind: targetId === 'menu' ? 'veil' : item.transition, color: item.color, phase: 'cover' });
   }, [pending]);
+
+  const navIndex = NAV_ORDER.indexOf(routeId);
+
+  const goNext = useCallback(() => {
+    if (navIndex < NAV_ORDER.length - 1) {
+      const id = NAV_ORDER[navIndex + 1];
+      go(id === 'menu' ? '/' : `/${id}`);
+    }
+  }, [navIndex, go]);
+
+  const goPrev = useCallback(() => {
+    if (navIndex > 0) {
+      const id = NAV_ORDER[navIndex - 1];
+      go(id === 'menu' ? '/' : `/${id}`);
+    }
+  }, [navIndex, go]);
+
+  // Wheel → page scroll navigation
+  useEffect(() => {
+    function onWheel(e: WheelEvent) {
+      if (wheelLock.current || pending) return;
+      if (Math.abs(e.deltaY) < 20) return;
+      wheelLock.current = true;
+      setTimeout(() => { wheelLock.current = false; }, 900);
+      if (e.deltaY > 0) goNext();
+      else goPrev();
+    }
+    window.addEventListener('wheel', onWheel, { passive: true });
+    return () => window.removeEventListener('wheel', onWheel);
+  }, [goNext, goPrev, pending]);
 
   function onCoverDone() {
     navigate(pending!);
@@ -72,7 +105,12 @@ export default function App() {
         <MainMenu onSelect={item => go(`/${item.id}`)} />
       ) : (
         PageComp && currentItem && (
-          <PageComp item={currentItem} onBack={() => go('/')} />
+          <PageComp
+            item={currentItem}
+            onBack={() => go('/')}
+            onNext={navIndex < NAV_ORDER.length - 1 ? goNext : undefined}
+            onPrev={navIndex > 0 ? goPrev : undefined}
+          />
         )
       )}
 

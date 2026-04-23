@@ -1,14 +1,14 @@
 import { useState } from 'react';
-import type { MenuItem } from '../types';
+import type { PageProps } from '../types';
 import { PROJECTS } from '../data';
 import { PageShell } from '../components/PageShell';
 
-export function ProjectsPage({ item, onBack }: { item: MenuItem; onBack: () => void }) {
+export function ProjectsPage({ item, onBack, onNext, onPrev }: PageProps) {
   const [focus, setFocus] = useState(0);
   const active = PROJECTS[focus];
 
   return (
-    <PageShell item={item} onBack={onBack}>
+    <PageShell item={item} onBack={onBack} onNext={onNext} onPrev={onPrev}>
       <div className="grid gap-10 h-full" style={{ gridTemplateColumns: '340px 1fr' }}>
         <div className="flex flex-col gap-1">
           <div className="font-mono uppercase" style={{ fontSize: 10, letterSpacing: '0.28em', opacity: 0.6, marginBottom: 12 }}>
