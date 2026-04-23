@@ -1,0 +1,47 @@
+@import "tailwindcss";
+
+@theme {
+  --color-bg-a: #0a1b3d;
+  --color-bg-b: #05102a;
+  --color-cyan: #4fd6ff;
+  --color-magenta: #ff3b8a;
+  --color-yellow-acc: #ffd23f;
+  --color-lime: #c6ff3d;
+  --color-violet: #a56bff;
+  --color-orange: #ff7a3a;
+  --color-text: #f3f7ff;
+  --color-ink: #061026;
+  --color-navy: #0a1b3d;
+
+  --font-mono: 'JetBrains Mono', monospace;
+  --font-display: 'Archivo Black', sans-serif;
+  --font-body: 'Archivo', sans-serif;
+}
+
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+html, body, #root {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  background: #05102a;
+  color: #f3f7ff;
+  font-family: 'Archivo', sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+@keyframes fragmentBlink {
+  50% { opacity: 0; }
+}
+
+.blink {
+  animation: fragmentBlink 1s steps(2) infinite;
+}
+
+input, textarea {
+  box-sizing: border-box;
+}
