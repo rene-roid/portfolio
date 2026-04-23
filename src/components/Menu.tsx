@@ -93,6 +93,9 @@ function IntroPanel({ hoveredItem }: { hoveredItem: MenuItem | null }) {
 }
 
 // ── Menu item row ─────────────────────────────────────────────────────────
+const hoverSfx = new Audio('/hovertft.mp3');
+hoverSfx.volume = 0.4;
+
 function MenuItemRow({ item, index, isActive, onHover, onClick }: {
   item: MenuItem;
   index: number;
@@ -107,11 +110,16 @@ function MenuItemRow({ item, index, isActive, onHover, onClick }: {
     return () => clearTimeout(id);
   }, [index]);
 
+  function playHover() {
+    hoverSfx.currentTime = 0;
+    hoverSfx.play().catch(() => {});
+  }
+
   const indent = 30 + index * 22;
 
   return (
     <div
-      onMouseEnter={() => onHover(item.id)}
+      onMouseEnter={() => { onHover(item.id); playHover(); }}
       onMouseLeave={() => onHover(null)}
       onClick={() => onClick(item)}
       className="relative cursor-pointer"
