@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import type { MenuItem } from '../../types';
-import { PageShell } from '../PageShell';
+import type { MenuItem } from "../types";
+import { PageShell } from "../components/PageShell";
 
 function inputStyle(accent: string): React.CSSProperties {
   return {
@@ -33,7 +33,7 @@ export function ContactPage({ item, onBack }: { item: MenuItem; onBack: () => vo
           </h1>
 
           <div className="flex flex-col gap-2" style={{ marginTop: 24 }}>
-            {[['EMAIL', 'k@vance.studio'], ['SOCIAL', '@kvance / everywhere'], ['LOCATION', 'Brooklyn, NY · GMT-5']].map(([k, v]) => (
+            {[['EMAIL', 'fernandete2003pro@gmail.com'], ['LINKEDIN', 'Fernando Solórzano'], ['LOCATION', 'Spain · GMT+2']].map(([k, v]) => (
               <div key={k} className="flex gap-4 items-baseline">
                 <span className="font-mono" style={{ fontSize: 10, letterSpacing: '0.28em', color: item.color, width: 90 }}>{k}</span>
                 <span className="font-body font-bold" style={{ fontSize: 18 }}>{v}</span>

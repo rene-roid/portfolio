@@ -1,7 +1,7 @@
 import { useState } from 'react';
-import type { MenuItem } from '../../types';
-import { LABS } from '../../data';
-import { PageShell } from '../PageShell';
+import type { MenuItem } from '../types';
+import { LABS } from '../data';
+import { PageShell } from '../components/PageShell';
 
 export function LabPage({ item, onBack }: { item: MenuItem; onBack: () => void }) {
   const [hov, setHov] = useState<number | null>(null);

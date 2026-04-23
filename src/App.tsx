@@ -4,12 +4,11 @@ import { MENU_ITEMS } from './data';
 import type { MenuItem, TransitionPhase } from './types';
 import { MainMenu } from './components/Menu';
 import { Transition } from './components/Transitions';
-import { AboutPage } from './components/pages/About';
-import { WorkPage } from './components/pages/Work';
-import { SkillsPage } from './components/pages/Skills';
-import { WritingPage } from './components/pages/Writing';
-import { LabPage } from './components/pages/Lab';
-import { ContactPage } from './components/pages/Contact';
+import { AboutPage } from './pages/About';
+import { ExperiencePage } from './pages/Experience';
+import { SkillsPage } from './pages/Skills';
+import { ProjectsPage } from './pages/Projects';
+import { ContactPage } from './pages/Contact';
 
 interface TransState {
   kind: string;
@@ -18,12 +17,11 @@ interface TransState {
 }
 
 const PAGES: Record<string, React.ComponentType<{ item: MenuItem; onBack: () => void }>> = {
-  about:   AboutPage,
-  work:    WorkPage,
-  skills:  SkillsPage,
-  writing: WritingPage,
-  lab:     LabPage,
-  contact: ContactPage,
+  about:      AboutPage,
+  experience: ExperiencePage,
+  skills:     SkillsPage,
+  projects:   ProjectsPage,
+  contact:    ContactPage,
 };
 
 export default function App() {

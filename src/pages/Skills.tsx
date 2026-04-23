@@ -1,6 +1,6 @@
-import type { MenuItem } from '../../types';
-import { SKILL_GROUPS } from '../../data';
-import { PageShell } from '../PageShell';
+import type { MenuItem } from '../types';
+import { SKILL_GROUPS } from '../data';
+import { PageShell } from '../components/PageShell';
 
 export function SkillsPage({ item, onBack }: { item: MenuItem; onBack: () => void }) {
   return (

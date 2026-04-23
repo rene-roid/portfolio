@@ -76,7 +76,7 @@ export function PageShell({ item, onBack, children }: {
       <CornerBracket corner="tr">
         <Reveal delay={160} from="right">
           <div className="text-right font-mono uppercase" style={{ fontSize: 11, letterSpacing: '0.22em', opacity: 0.7 }}>
-            <div>FERNANDO SOLÓRZANO / FRONTEND ENG</div>
+            <div>FERNANDO SOLÓRZANO / FULL STACK DEV</div>
             <div style={{ marginTop: 4, opacity: 0.55 }}>{item.sub}</div>
           </div>
         </Reveal>

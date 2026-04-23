@@ -230,7 +230,7 @@ export function MainMenu({ onSelect }: { onSelect: (item: MenuItem) => void }) {
 
       <CornerBracket corner="tr">
         <div className="text-right font-mono uppercase" style={{ fontSize: 11, letterSpacing: '0.22em', opacity: 0.7 }}>
-          <div>FERNANDO SOLÓRZANO / FRONTEND ENG</div>
+          <div>FERNANDO SOLÓRZANO / FULL STACK DEV</div>
           <div style={{ marginTop: 4, opacity: 0.55 }}>LOCAL TIME · <LiveClock /></div>
         </div>
       </CornerBracket>

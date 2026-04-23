@@ -1,6 +1,6 @@
-import type { MenuItem } from '../../types';
-import { POSTS } from '../../data';
-import { PageShell } from '../PageShell';
+import type { MenuItem } from '../types';
+import { POSTS } from '../data';
+import { PageShell } from '../components/PageShell';
 
 export function WritingPage({ item, onBack }: { item: MenuItem; onBack: () => void }) {
   return (

@@ -1,29 +1,29 @@
 import { useState } from 'react';
-import type { MenuItem } from '../../types';
-import { WORKS } from '../../data';
-import { PageShell } from '../PageShell';
+import type { MenuItem } from '../types';
+import { PROJECTS } from '../data';
+import { PageShell } from '../components/PageShell';
 
-export function WorkPage({ item, onBack }: { item: MenuItem; onBack: () => void }) {
+export function ProjectsPage({ item, onBack }: { item: MenuItem; onBack: () => void }) {
   const [focus, setFocus] = useState(0);
-  const active = WORKS[focus];
+  const active = PROJECTS[focus];
 
   return (
     <PageShell item={item} onBack={onBack}>
       <div className="grid gap-10 h-full" style={{ gridTemplateColumns: '340px 1fr' }}>
         <div className="flex flex-col gap-1">
           <div className="font-mono uppercase" style={{ fontSize: 10, letterSpacing: '0.28em', opacity: 0.6, marginBottom: 12 }}>
-            06 ENTRIES
+            {String(PROJECTS.length).padStart(2, '0')} ENTRIES
           </div>
-          {WORKS.map((w, i) => (
+          {PROJECTS.map((p, i) => (
             <div
-              key={w.name}
+              key={p.name}
               onMouseEnter={() => setFocus(i)}
               className="cursor-pointer flex items-baseline gap-2"
               style={{
                 padding: '10px 14px',
-                background: focus === i ? w.accent : 'transparent',
+                background: focus === i ? p.accent : 'transparent',
                 color: focus === i ? '#0a1b3d' : '#fff',
-                borderLeft: `3px solid ${w.accent}`,
+                borderLeft: `3px solid ${p.accent}`,
                 transform: `skewX(${focus === i ? -8 : 0}deg) translateX(${focus === i ? 10 : 0}px)`,
                 transition: 'all 140ms cubic-bezier(.7,0,.2,1.6)',
               }}
@@ -31,7 +31,7 @@ export function WorkPage({ item, onBack }: { item: MenuItem; onBack: () => void 
               <span className="font-mono" style={{ fontSize: 11, opacity: 0.7 }}>
                 {String(i + 1).padStart(2, '0')}
               </span>
-              <span className="font-display italic" style={{ fontSize: 22, letterSpacing: '-0.02em' }}>{w.name}</span>
+              <span className="font-display italic" style={{ fontSize: 22, letterSpacing: '-0.02em' }}>{p.name}</span>
             </div>
           ))}
         </div>
@@ -57,11 +57,11 @@ export function WorkPage({ item, onBack }: { item: MenuItem; onBack: () => void 
           }}>
             <svg className="absolute inset-0 w-full h-full" style={{ opacity: 0.2 }}>
               <defs>
-                <pattern id="work-stripes" width="20" height="20" patternUnits="userSpaceOnUse" patternTransform="rotate(30)">
+                <pattern id="proj-stripes" width="20" height="20" patternUnits="userSpaceOnUse" patternTransform="rotate(30)">
                   <line x1="0" y1="0" x2="0" y2="20" stroke={active.accent} strokeWidth="4" />
                 </pattern>
               </defs>
-              <rect width="100%" height="100%" fill="url(#work-stripes)" />
+              <rect width="100%" height="100%" fill="url(#proj-stripes)" />
             </svg>
             <div className="absolute font-mono uppercase" style={{ left: 24, top: 20, fontSize: 10, letterSpacing: '0.28em', color: '#fff', opacity: 0.7 }}>
               [ PROJECT HERO · PLACEHOLDER ]
