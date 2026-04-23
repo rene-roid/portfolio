@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import type { MenuItem } from '../types';
-import { BackgroundField, CornerBracket, EdgeText, HudBadge, HudControlHint, ScreenLabel } from './Hud';
+import { BackgroundField, CornerBracket, EdgeText, HudBadge } from './Hud';
 
 export function Reveal({ delay = 0, from = 'up', dist = 30, dur = 420, children, style }: {
   delay?: number;
@@ -129,16 +129,6 @@ export function PageShell({ item, onBack, onNext, onPrev, children }: {
 
       {onPrev && <NavArrow dir="prev" onClick={onPrev} color={item.color} />}
       {onNext && <NavArrow dir="next" onClick={onNext} color={item.color} />}
-
-      <CornerBracket corner="br">
-        <Reveal delay={260} from="right">
-          <ScreenLabel command="Return" hint="Main Menu" />
-          <div className="text-right" style={{ marginTop: 14 }}>
-            <HudControlHint keyLabel="ESC" action="Back" />
-            <HudControlHint keyLabel="SCROLL" action="Navigate" />
-          </div>
-        </Reveal>
-      </CornerBracket>
 
       <CornerBracket corner="bl">
         <Reveal delay={300} from="left">

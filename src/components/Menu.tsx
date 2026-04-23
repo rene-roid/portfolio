@@ -269,7 +269,7 @@ export function MainMenu({ onSelect }: { onSelect: (item: MenuItem) => void }) {
         <ScreenLabel command={current ? current.command : 'Select Command'} hint="Command" />
         <div className="text-right" style={{ marginTop: 14 }}>
           <HudControlHint keyLabel="↵" action="Confirm" />
-          <HudControlHint keyLabel="ESC" action="Back" />
+          {/* <HudControlHint keyLabel="ESC" action="Back" /> */}
         </div>
       </CornerBracket>
 

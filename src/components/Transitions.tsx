@@ -158,30 +158,23 @@ function VeilTransition({ color, phase, onDone }: TransitionProps) {
   }, [onDone]);
 
   const covering = phase === 'cover';
-  const N = 8;
+  const N = 14;
 
   return (
     <div className="fixed inset-0 z-[100] pointer-events-none flex">
       {Array.from({ length: N }).map((_, i) => {
-        const delay = i * 40;
+        const delay = i * 28;
         const y = covering ? (t ? '0%' : '-105%') : (t ? '-105%' : '0%');
         return (
           <div key={i} style={{
-            width: `${100 / N + 0.5}%`,
+            width: `${100 / N + 0.2}%`,
             flexShrink: 0,
-            background: color,
+            background: `linear-gradient(to bottom, #05102a 90%, ${color} 85%)`,
             transform: `translateY(${y})`,
             transition: `transform 480ms cubic-bezier(.76,0,.24,1) ${delay}ms`,
           }} />
         );
       })}
-      {/* Subtle scanline overlay while covered */}
-      <div className="absolute inset-0" style={{
-        // backgroundImage: 'repeating-linear-gradient(0deg, rgba(0,0,0,0.18) 0 1px, transparent 1px 3px)',
-        opacity: covering ? (t ? 0.7 : 0) : (t ? 0 : 0.7),
-        transition: 'opacity 300ms 200ms',
-        pointerEvents: 'none',
-      }} />
     </div>
   );
 }
