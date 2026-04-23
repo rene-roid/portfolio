@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { MENU_ITEMS } from './data';
-import type { MenuItem, PageProps, TransitionPhase } from './types';
+import type { PageProps, TransitionPhase } from './types';
 import { MainMenu } from './components/Menu';
 import { Transition } from './components/Transitions';
 import { audioPlayer } from './audioPlayer';

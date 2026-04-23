@@ -6,6 +6,7 @@ class AudioPlayerSingleton {
   private audio: HTMLAudioElement | null = null;
   private audioCtx: AudioContext | null = null;
   private _analyser: AnalyserNode | null = null;
+  private gainNode: GainNode | null = null;
   private _playing = false;
   private _volume = 0.09;
   private _progress = 0;
@@ -18,7 +19,7 @@ class AudioPlayerSingleton {
 
     const audio = new Audio('/MusicMenu%20Update.mp3');
     audio.loop = true;
-    audio.volume = this._volume;
+    audio.volume = 1; // gain node controls volume after AudioContext is created
     this.audio = audio;
 
     audio.addEventListener('timeupdate', () => {
@@ -28,12 +29,24 @@ class AudioPlayerSingleton {
       }
     });
 
+    const tryPlay = () => {
+      audio.play().then(() => {
+        this._playing = true;
+        this.initCtx();
+        this.notify();
+      }).catch(() => {});
+    };
+
     audio.play().then(() => {
       this._playing = true;
       this.initCtx();
       this.notify();
     }).catch(() => {
-      // autoplay blocked — user must interact
+      // Autoplay blocked — play on first user interaction
+      const opts = { once: true } as const;
+      document.addEventListener('click',      tryPlay, opts);
+      document.addEventListener('keydown',    tryPlay, opts);
+      document.addEventListener('touchstart', tryPlay, opts);
     });
   }
 
@@ -41,12 +54,22 @@ class AudioPlayerSingleton {
     if (this.audioCtx || !this.audio) return;
     const ctx = new AudioContext();
     this.audioCtx = ctx;
+
+    // Analyser taps the raw signal — gain controls output volume after it
     const an = ctx.createAnalyser();
     an.fftSize = 256;
-    an.smoothingTimeConstant = 0.82;
+    an.smoothingTimeConstant = 0.91;
+
+    const gain = ctx.createGain();
+    gain.gain.value = this._volume;
+    this.gainNode = gain;
+
     const src = ctx.createMediaElementSource(this.audio);
+    this.audio.volume = 1; // volume is controlled by gainNode, not the element
     src.connect(an);
-    an.connect(ctx.destination);
+    an.connect(gain);
+    gain.connect(ctx.destination);
+
     this._analyser = an;
     this.notify();
   }
@@ -66,7 +89,7 @@ class AudioPlayerSingleton {
 
   setVolume(v: number) {
     this._volume = Math.max(0, Math.min(1, v));
-    if (this.audio) this.audio.volume = this._volume;
+    if (this.gainNode) this.gainNode.gain.value = this._volume;
     this.notify();
   }
 

@@ -32,6 +32,7 @@ function AudioVisualizer({ analyser, colorRef }: {
     const ctx = canvas.getContext('2d')!;
     const bins = new Uint8Array(analyser.frequencyBinCount);
     const peaks = new Float32Array(analyser.frequencyBinCount);
+    const bars = new Float32Array(analyser.frequencyBinCount);
     let frameId: number;
 
     function resize() {
@@ -51,16 +52,18 @@ function AudioVisualizer({ analyser, colorRef }: {
       ctx.clearRect(0, 0, w, h);
 
       const [r, g, b] = hexToRgb(colorRef.current);
+      const skip = 3;
       const count = Math.min(bins.length, 80);
-      const barW = w / count;
+      const barW = w / (count - skip);
       const maxBarH = h * 0.28;
 
-      for (let i = 0; i < count; i++) {
+      for (let i = skip; i < count; i++) {
         const v = bins[i] / 255;
-        peaks[i] = Math.max(peaks[i] * 0.94, v);
-        const bh = peaks[i] * maxBarH;
+        peaks[i] = Math.max(peaks[i] * 0.97, v);
+        bars[i] += (peaks[i] - bars[i]) * 0.07;
+        const bh = bars[i] * maxBarH;
         if (bh < 1) continue;
-        const x = i * barW;
+        const x = (i - skip) * barW;
         const y = h - bh;
         const grad = ctx.createLinearGradient(x, y, x, h);
         grad.addColorStop(0, `rgba(${r},${g},${b},0.75)`);
@@ -70,7 +73,7 @@ function AudioVisualizer({ analyser, colorRef }: {
       }
 
       // Bass radial glow
-      const bass = (bins[0] + bins[1] + bins[2]) / (3 * 255);
+      const bass = (bins[skip] + bins[skip + 1] + bins[skip + 2]) / (3 * 255);
       if (bass > 0.04) {
         const grd = ctx.createRadialGradient(w / 2, h, 0, w / 2, h * 0.8, w * 0.5);
         grd.addColorStop(0, `rgba(${r},${g},${b},${Math.min(bass * 0.2, 0.15).toFixed(3)})`);
@@ -256,7 +259,7 @@ export function NowPlayingPlayer({ label, value, accent }: {
       </div>
 
       {/* Volume row */}
-      <div className="flex items-center gap-2" style={{ marginTop: 8 }}>
+      <div className="flex items-center gap-2" style={{ marginTop: 2 }}>
         <svg width="11" height="11" viewBox="0 0 11 11" fill="none" style={{ flexShrink: 0, opacity: 0.6 }}>
           <polygon points="0,3 4,3 7,0 7,11 4,8 0,8" fill="currentColor" />
           {volume > 0.05 && <path d="M8.5 3.5 Q10.5 5.5 8.5 7.5" stroke="currentColor" strokeWidth="1.2" fill="none" strokeLinecap="round" />}
@@ -279,9 +282,9 @@ export function NowPlayingPlayer({ label, value, accent }: {
             style={{ position: 'absolute', inset: 0, opacity: 0, cursor: 'pointer', width: '100%' }}
           />
         </div>
-        <span className="font-mono" style={{ fontSize: 9, opacity: 0.5, flexShrink: 0, minWidth: 28, textAlign: 'right' }}>
+        {/* <span className="font-mono" style={{ fontSize: 9, opacity: 0.5, flexShrink: 0, minWidth: 28, textAlign: 'right' }}>
           {Math.round(volume * 100)}%
-        </span>
+        </span> */}
       </div>
     </div>
   );
