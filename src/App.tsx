@@ -4,6 +4,7 @@ import { MENU_ITEMS } from './data';
 import type { MenuItem, PageProps, TransitionPhase } from './types';
 import { MainMenu } from './components/Menu';
 import { Transition } from './components/Transitions';
+import { audioPlayer } from './audioPlayer';
 import { AboutPage } from './pages/About';
 import { ExperiencePage } from './pages/Experience';
 import { SkillsPage } from './pages/Skills';
@@ -32,6 +33,8 @@ export default function App() {
   const [pending, setPending] = useState<string | null>(null);
   const [trans, setTrans] = useState<TransState | null>(null);
   const wheelLock = useRef(false);
+
+  useEffect(() => { audioPlayer.init(); }, []);
 
   const pathname = location.pathname;
   const routeId = pathname === '/' ? 'menu' : pathname.slice(1);

@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import type { MenuItem } from '../types';
-import { BackgroundField, CornerBracket, EdgeText, HudBadge } from './Hud';
+import { BackgroundField, CornerBracket, EdgeText, NowPlayingPlayer } from './Hud';
 
 export function Reveal({ delay = 0, from = 'up', dist = 30, dur = 420, children, style }: {
   delay?: number;
@@ -100,7 +100,7 @@ export function PageShell({ item, onBack, onNext, onPrev, children }: {
 }) {
   return (
     <div className="absolute inset-0 z-[3]">
-      <BackgroundField hue={item.hue} />
+      <BackgroundField hue={item.hue} accentColor={item.color} />
 
       <Reveal delay={60} from="down" dist={60}>
         <EdgeText side="left" text={item.label} color={item.color} />
@@ -108,7 +108,7 @@ export function PageShell({ item, onBack, onNext, onPrev, children }: {
 
       <CornerBracket corner="tl">
         <Reveal delay={120} from="left">
-          <HudBadge label="section" value={item.label} accent={item.color} />
+          <NowPlayingPlayer label="section" value={item.label} accent={item.color} />
         </Reveal>
       </CornerBracket>
 

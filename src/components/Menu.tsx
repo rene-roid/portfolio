@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { MENU_ITEMS } from '../data';
 import type { MenuItem } from '../types';
-import { BackgroundField, CornerBracket, EdgeText, HudBadge, HudControlHint, ScreenLabel } from './Hud';
+import { BackgroundField, CornerBracket, EdgeText, HudControlHint, NowPlayingPlayer, ScreenLabel } from './Hud';
 
 // ── Intro panel (left side) ────────────────────────────────────────────────
 function IntroPanel({ hoveredItem }: { hoveredItem: MenuItem | null }) {
@@ -150,7 +150,9 @@ function MenuItemRow({ item, index, isActive, onHover, onClick }: {
         lineHeight: 0.95, letterSpacing: '-0.03em',
         color: isActive ? '#0a1b3d' : '#ffffff',
         WebkitTextStroke: isActive ? '0' : '1px rgba(255,255,255,0.9)',
-        textShadow: isActive ? `-2px 0 rgba(255,30,80,0.7), 2px 0 rgba(0,220,255,0.7), 4px 4px 0 ${item.color}` : 'none',
+        textShadow: isActive ? `
+        // -2px 0 rgba(255,30,80,0.7), 2px 0 rgba(0,220,255,0.7), 
+        4px 4px 0 ${item.color}` : 'none',
         transform: 'skewX(-8deg)', padding: '0 6px',
         transition: 'color 120ms linear',
       }}>
@@ -219,13 +221,13 @@ export function MainMenu({ onSelect }: { onSelect: (item: MenuItem) => void }) {
 
   return (
     <div ref={containerRef} className="absolute inset-0 z-[3]" tabIndex={-1}>
-      <BackgroundField hue={current?.hue ?? 'blue'} />
+      <BackgroundField hue={current?.hue ?? 'blue'} accentColor={current?.color ?? '#4fd6ff'} />
 
       <EdgeText side="left" text="FRAGMENT·0426" color="#ffffff" />
       <EdgeText side="right" text={current ? current.command.toUpperCase().replace(/ /g, '·') : 'MAIN·MENU'} color={current?.color ?? '#4fd6ff'} />
 
       <CornerBracket corner="tl">
-        <HudBadge label="now playing" value="welcome.mp3" accent={current?.color ?? '#4fd6ff'} />
+        <NowPlayingPlayer label="now playing" value="welcome.mp3" accent={current?.color ?? '#4fd6ff'} />
       </CornerBracket>
 
       <CornerBracket corner="tr">

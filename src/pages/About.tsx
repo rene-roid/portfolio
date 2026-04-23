@@ -1,5 +1,68 @@
+import { useState, useEffect } from 'react';
 import type { PageProps } from "../types";
 import { PageShell, StyledCard } from "../components/PageShell";
+
+const SHINE_INTERVAL  = 0.07;   // seconds between each char glint peak
+const SHINE_DURATION  = 0.35;
+const WAVE_DURATION   = 0.70;
+const TOTAL_CHARS     = 25;     // "I BUILD"(7) + "WEB APPS"(8) + "THAT SHIP."(10)
+const WAVE_START      = (TOTAL_CHARS - 1) * SHINE_INTERVAL + SHINE_DURATION + 0.1;
+
+function AnimatedHeadline({ color }: { color: string }) {
+  const [cycle, setCycle] = useState(0);
+
+  useEffect(() => {
+    let intervalId: ReturnType<typeof setInterval>;
+    const timeoutId = setTimeout(() => {
+      setCycle(1);
+      intervalId = setInterval(() => setCycle(c => c + 1), 15_000);
+    }, 2_000);
+    return () => {
+      clearTimeout(timeoutId);
+      clearInterval(intervalId);
+    };
+  }, []);
+
+  let gi = 0;
+
+  const ch = (char: string, accent = false) => {
+    const idx = gi++;
+    const isSpace = char === ' ';
+    // cycle 0 = waiting for first trigger (chars sit still); cycle >= 1 = playing
+    const base       = cycle === 0 ? 9999 : 0;  // push delays into the future until first trigger
+    const shineDelay = base + idx * SHINE_INTERVAL;
+    const waveDelay  = base + WAVE_START + idx * 0.05;
+    return (
+      <span
+        key={`${idx}-${cycle}`}
+        style={{
+          display: 'inline-block',
+          animationName: isSpace ? 'none' : 'char-shine, char-wave',
+          animationDuration: `${SHINE_DURATION}s, ${WAVE_DURATION}s`,
+          animationDelay: `${shineDelay}s, ${waveDelay}s`,
+          animationFillMode: 'none',
+          animationIterationCount: '1, 1',
+          animationTimingFunction: 'ease-in-out, ease-in-out',
+          ...(accent ? { color, textShadow: '6px 6px 0 #fff' } : {}),
+        }}
+      >
+        {isSpace ? '\u00A0' : char}
+      </span>
+    );
+  };
+
+  return (
+    <>
+      {'I BUILD'.split('').map(c => ch(c))}
+      <br />
+      {'WEB APPS'.split('').map(c => ch(c))}
+      <br />
+      {'THAT '.split('').map(c => ch(c))}
+      {'SHIP'.split('').map(c => ch(c, true))}
+      {ch('.')}
+    </>
+  );
+}
 
 export function AboutPage({ item, onBack, onNext, onPrev }: PageProps) {
   return (
@@ -7,7 +70,7 @@ export function AboutPage({ item, onBack, onNext, onPrev }: PageProps) {
       <div className="grid gap-10 h-full" style={{ gridTemplateColumns: '1.1fr 1fr' }}>
         <div className="relative">
           <div className="font-mono uppercase" style={{ fontSize: 11, letterSpacing: '0.28em', opacity: 0.7 }}>
-            // profile.read( )
+            // profile.read()
           </div>
           <h1 className="font-display italic" style={{
             marginTop: 16,
@@ -16,7 +79,7 @@ export function AboutPage({ item, onBack, onNext, onPrev }: PageProps) {
             textShadow: `6px 6px 0 ${item.color}`,
             transform: 'skewX(-6deg)',
           }}>
-            I BUILD<br />WEB APPS<br />THAT <span style={{ color: item.color }}>SHIP</span>.
+            <AnimatedHeadline color={item.color} />
           </h1>
           <p className="font-body" style={{
             marginTop: 28, maxWidth: 520,
