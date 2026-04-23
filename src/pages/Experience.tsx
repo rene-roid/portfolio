@@ -64,7 +64,7 @@ export function ExperiencePage({ item, onBack, onNext, onPrev }: PageProps) {
                   <div className="font-display italic" style={{ fontSize: 20, letterSpacing: '-0.02em' }}>{j.role}</div>
                   <div className="font-mono uppercase" style={{ fontSize: 11, letterSpacing: '0.22em', color: j.accent, marginTop: 2 }}>{j.company}</div>
                 </div>
-                <div className="font-mono" style={{ fontSize: 11, letterSpacing: '0.14em', opacity: 0.6, whiteSpace: 'nowrap', marginLeft: 12 }}>{getJobPeriodLabel(j)}</div>
+                <div className="font-mono" style={{ fontSize: 11, opacity: 0.6, whiteSpace: 'nowrap', marginLeft: 12 }}>{getJobPeriodLabel(j)}</div>
               </div>
               <p className="font-body" style={{ marginTop: 10, fontSize: 14, lineHeight: 1.5, color: '#d9e6ff', opacity: 0.85 }}>{j.desc}</p>
             </StyledCard>

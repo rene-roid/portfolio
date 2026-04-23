@@ -150,7 +150,7 @@ function MenuItemRow({ item, index, isActive, onHover, onClick }: {
         lineHeight: 0.95, letterSpacing: '-0.03em',
         color: isActive ? '#0a1b3d' : '#ffffff',
         WebkitTextStroke: isActive ? '0' : '1px rgba(255,255,255,0.9)',
-        textShadow: isActive ? `4px 4px 0 ${item.color}` : 'none',
+        textShadow: isActive ? `-2px 0 rgba(255,30,80,0.7), 2px 0 rgba(0,220,255,0.7), 4px 4px 0 ${item.color}` : 'none',
         transform: 'skewX(-8deg)', padding: '0 6px',
         transition: 'color 120ms linear',
       }}>
