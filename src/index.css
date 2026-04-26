@@ -60,3 +60,43 @@ html, body, #root {
 input, textarea {
   box-sizing: border-box;
 }
+
+/* ── Boot sequence ───────────────────────────────────────────────────────── */
+@keyframes boot-flash {
+  0%   { opacity: 0.6; }
+  100% { opacity: 0; }
+}
+
+@keyframes boot-scan {
+  0%   { top: -4px; opacity: 1; }
+  100% { top: 100vh; opacity: 0.1; }
+}
+
+.boot-scan-line {
+  position: absolute;
+  left: 0; right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, transparent 0%, #18e6ff 20%, #ffffff 50%, #18e6ff 80%, transparent 100%);
+  box-shadow: 0 0 22px 8px rgba(79,214,255,0.65), 0 0 55px 14px rgba(255,255,255,0.12);
+  animation: boot-scan 0.58s cubic-bezier(.15,0,.85,1) forwards;
+  pointer-events: none;
+}
+
+.boot-flash {
+  animation: boot-flash 0.38s ease-out forwards;
+}
+
+/* ── Name glitch ─────────────────────────────────────────────────────────── */
+@keyframes name-glitch {
+  0%   { text-shadow: 4px 4px 0 rgba(0,0,0,.45),  2px 0 0 #ff2d7d,  -2px 0 0 #18e6ff; transform: skewX(-10deg) translateX(0); }
+  12%  { text-shadow: 13px 3px 0 rgba(0,0,0,.5), -10px 0 0 #ff2d7d,   9px 0 0 #18e6ff; transform: skewX(-11deg) translateX(6px); }
+  25%  { text-shadow:  4px 4px 0 rgba(0,0,0,.45),  2px 0 0 #ff2d7d,  -2px 0 0 #18e6ff; transform: skewX(-10deg) translateX(-2px); }
+  40%  { text-shadow: 19px 2px 0 rgba(0,0,0,.5), -15px 0 0 #ff2d7d,  12px 0 0 #18e6ff; transform: skewX(-13deg) translateX(-5px); }
+  55%  { text-shadow:  4px 4px 0 rgba(0,0,0,.45),  2px 0 0 #ff2d7d,  -2px 0 0 #18e6ff; transform: skewX(-10deg) translateX(3px); }
+  74%  { text-shadow:  7px 4px 0 rgba(0,0,0,.45),  5px 0 0 #ff2d7d,  -4px 0 0 #18e6ff; transform: skewX(-10deg) translateX(0); }
+  100% { text-shadow:  4px 4px 0 rgba(0,0,0,.45),  2px 0 0 #ff2d7d,  -2px 0 0 #18e6ff; transform: skewX(-10deg); }
+}
+
+.name-glitch {
+  animation: name-glitch 520ms ease forwards;
+}

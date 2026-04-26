@@ -6,11 +6,28 @@ import { BackgroundField, CornerBracket, EdgeText, HudControlHint, NowPlayingPla
 // ── Intro panel (left side) ────────────────────────────────────────────────
 function IntroPanel({ hoveredItem }: { hoveredItem: MenuItem | null }) {
   const [step, setStep] = useState(0);
+  const [glitching, setGlitching] = useState(false);
+  const glitchTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
+  // Step animations start after boot scan completes (~650ms)
   useEffect(() => {
-    const seq = [180, 320, 480, 650, 850];
+    const base = 650;
+    const seq = [180, 320, 480, 650, 850].map(t => t + base);
     const ids = seq.map((t, i) => setTimeout(() => setStep(i + 1), t));
     return () => ids.forEach(clearTimeout);
+  }, []);
+
+  // Periodic name glitch every 5–10s
+  useEffect(() => {
+    function schedule() {
+      glitchTimer.current = setTimeout(() => {
+        setGlitching(true);
+        setTimeout(() => setGlitching(false), 520);
+        schedule();
+      }, 5000 + Math.random() * 5000);
+    }
+    schedule();
+    return () => { if (glitchTimer.current) clearTimeout(glitchTimer.current); };
   }, []);
 
   const accent = hoveredItem?.color ?? '#4fd6ff';
@@ -24,7 +41,7 @@ function IntroPanel({ hoveredItem }: { hoveredItem: MenuItem | null }) {
         transition: 'opacity 380ms cubic-bezier(.7,0,.2,1), transform 380ms cubic-bezier(.7,0,.2,1)',
         fontSize: 12, letterSpacing: '0.3em', color: accent, marginBottom: 14,
       }}>
-        // <span>hello_world( )</span>
+        // <span>hello_world()</span>
       </div>
 
       {/* HI, I'M */}
@@ -53,7 +70,7 @@ function IntroPanel({ hoveredItem }: { hoveredItem: MenuItem | null }) {
           transition: 'transform 500ms cubic-bezier(.7,0,.2,1)',
           zIndex: 0,
         }} />
-        <div className="relative font-display italic" style={{
+        <div className={`relative font-display italic${glitching ? ' name-glitch' : ''}`} style={{
           zIndex: 1,
           fontSize: 'clamp(64px, 8.8vw, 140px)', lineHeight: 0.82,
           letterSpacing: '-0.05em', color: '#fff',
@@ -200,7 +217,13 @@ export function LiveClock() {
 export function MainMenu({ onSelect }: { onSelect: (item: MenuItem) => void }) {
   const [mouseHovered, setMouseHovered] = useState<string | null>(null);
   const [keyIndex, setKeyIndex] = useState<number>(-1);
+  const [scanning, setScanning] = useState(true);
   const containerRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const id = setTimeout(() => setScanning(false), 700);
+    return () => clearTimeout(id);
+  }, []);
 
   useEffect(() => {
     function onKey(e: KeyboardEvent) {
@@ -230,6 +253,13 @@ export function MainMenu({ onSelect }: { onSelect: (item: MenuItem) => void }) {
   return (
     <div ref={containerRef} className="absolute inset-0 z-3" tabIndex={-1}>
       <BackgroundField hue={current?.hue ?? 'blue'} accentColor={current?.color ?? '#4fd6ff'} />
+
+      {scanning && (
+        <div style={{ position: 'absolute', inset: 0, zIndex: 99, pointerEvents: 'none', overflow: 'hidden' }}>
+          <div style={{ position: 'absolute', inset: 0 }} className="boot-flash" />
+          <div className="boot-scan-line" />
+        </div>
+      )}
 
       <EdgeText side="left" text="FRAGMENT·0426" color="#ffffff" />
       <EdgeText side="right" text={current ? current.command.toUpperCase().replace(/ /g, '·') : 'MAIN·MENU'} color={current?.color ?? '#4fd6ff'} />
