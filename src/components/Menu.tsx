@@ -41,7 +41,7 @@ function IntroPanel({ hoveredItem }: { hoveredItem: MenuItem | null }) {
         transition: 'opacity 380ms cubic-bezier(.7,0,.2,1), transform 380ms cubic-bezier(.7,0,.2,1)',
         fontSize: 12, letterSpacing: '0.3em', color: accent, marginBottom: 14,
       }}>
-        // <span>hello_world()</span>
+        <span>hello_world()</span>
       </div>
 
       {/* HI, I'M */}
@@ -315,9 +315,7 @@ export function MainMenu({ onSelect }: { onSelect: (item: MenuItem) => void }) {
 
       <CornerBracket corner="bl">
         <div className="font-mono uppercase" style={{ fontSize: 10, letterSpacing: '0.3em', opacity: 0.5, maxWidth: 260, lineHeight: 1.8 }}>
-          <div>// portfolio / v4.26</div>
-          <div>// status: live</div>
-          <div>// build: 2026.04.23</div>
+          <div>welcome to my portfolio!! :D</div>
         </div>
       </CornerBracket>
     </div>

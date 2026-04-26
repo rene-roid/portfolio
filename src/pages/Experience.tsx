@@ -9,7 +9,7 @@ export function ExperiencePage({ item, onBack, onNext, onPrev }: PageProps) {
       <div className="grid gap-10 h-full" style={{ gridTemplateColumns: '1fr 1fr' }}>
         <div className="flex flex-col gap-3">
           <div className="font-mono uppercase" style={{ fontSize: 11, letterSpacing: '0.28em', opacity: 0.7, marginBottom: 4 }}>
-            // experience.load()
+            experience.load()
           </div>
           <div className="font-display italic" style={{
             fontSize: 'clamp(36px, 4vw, 58px)', lineHeight: 0.9,
@@ -17,7 +17,7 @@ export function ExperiencePage({ item, onBack, onNext, onPrev }: PageProps) {
             color: '#fff', textShadow: `4px 4px 0 ${item.color}`,
             marginBottom: 10,
           }}>
-            WORK<br /><span style={{ color: item.color }}>HISTORY</span>
+            WORK<br /><span style={{ color: item.color, textShadow: `4px 4px 0 #fff` }}>HISTORY</span>
           </div>
           {EXPERIENCE.jobs.map(j => (
             <StyledCard key={j.company} accent={j.accent}>
@@ -35,7 +35,7 @@ export function ExperiencePage({ item, onBack, onNext, onPrev }: PageProps) {
 
         <div className="flex flex-col gap-3">
           <div className="font-mono uppercase" style={{ fontSize: 11, letterSpacing: '0.28em', opacity: 0.7, marginBottom: 4 }}>
-            // education.load()
+            education.load()
           </div>
           <div className="font-display italic" style={{
             fontSize: 'clamp(36px, 4vw, 58px)', lineHeight: 0.9,

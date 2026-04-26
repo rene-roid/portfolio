@@ -12,7 +12,7 @@ export function ProjectsPage({ item, onBack, onNext, onPrev }: PageProps) {
       <div className="grid gap-10 h-full" style={{ gridTemplateColumns: '340px 1fr' }}>
         <div className="flex flex-col gap-1">
             <div className="font-mono uppercase" style={{ fontSize: 11, letterSpacing: '0.28em', opacity: 0.7 }}>
-            // projects.load()
+            projects.load()
           </div>
           <div className="font-mono uppercase" style={{ fontSize: 10, letterSpacing: '0.28em', opacity: 0.6, marginBottom: 12 }}>
             {String(PROJECTS.length).padStart(2, '0')} ENTRIES LOADED

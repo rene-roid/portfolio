@@ -72,7 +72,7 @@ export function AboutPage({ item, onBack, onNext, onPrev }: PageProps) {
       <div className="grid gap-10 h-full" style={{ gridTemplateColumns: '1.1fr 1fr' }}>
         <div className="relative">
           <div className="font-mono uppercase" style={{ fontSize: 11, letterSpacing: '0.28em', opacity: 0.7 }}>
-            // profile.read()
+            profile.read()
           </div>
           <h1 className="font-display italic" style={{
             marginTop: 16,
@@ -116,7 +116,7 @@ export function AboutPage({ item, onBack, onNext, onPrev }: PageProps) {
         </div>
 
         <div className="flex flex-col gap-4 justify-center">
-          <StyledCard accent={item.color}>
+          <StyledCard accent="#c6ff3d">
             <div className="font-mono uppercase" style={{ fontSize: 10, letterSpacing: '0.28em', opacity: 0.6 }}>CURRENTLY</div>
             <div className="font-display italic" style={{ fontSize: 26, marginTop: 6 }}>Full Stack Dev, INFINI</div>
             <div style={{ opacity: 0.7, marginTop: 4, fontSize: 14 }}>Building custom client-facing web products from scratch.</div>
@@ -131,7 +131,7 @@ export function AboutPage({ item, onBack, onNext, onPrev }: PageProps) {
             <div className="font-display italic" style={{ fontSize: 20, marginTop: 6, lineHeight: 1.2 }}>{EXPERIENCE.education[0].title}</div>
             <div className="font-mono uppercase" style={{ fontSize: 11, letterSpacing: '0.18em', marginTop: 4, color: '#ff3b8a' }}>{EXPERIENCE.education[0].institution} · {EXPERIENCE.education[0].period}</div>
           </StyledCard>
-          <StyledCard accent="#ffd23f">
+          <StyledCard accent="#258a00">
             <div className="font-mono uppercase" style={{ fontSize: 10, letterSpacing: '0.28em', opacity: 0.6 }}>IN PURSUIT OF</div>
             <div className="font-body italic font-black" style={{ fontSize: 18, marginTop: 6, lineHeight: 1.3 }}>
               A role where I ship polished full-stack products and grow with a team that cares about craft.

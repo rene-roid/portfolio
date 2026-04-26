@@ -20,7 +20,7 @@ export function ContactPage({ item, onBack, onNext, onPrev }: PageProps) {
       <div className="grid gap-16 h-full items-center" style={{ gridTemplateColumns: '1fr 1fr' }}>
         <div>
           <div className="font-mono uppercase" style={{ fontSize: 11, letterSpacing: '0.28em', opacity: 0.7 }}>
-            // signal.open( )
+            signal.open()
           </div>
           <h1 className="font-display italic" style={{
             marginTop: 6,
@@ -28,15 +28,19 @@ export function ContactPage({ item, onBack, onNext, onPrev }: PageProps) {
             letterSpacing: '-0.04em', color: '#fff', transform: 'skewX(-8deg)',
           }}>
             LET'S<br />
-            <span style={{ color: item.color, textShadow: '6px 6px 0 #0a1b3d' }}>MAKE</span>
-            <br />SOMETHING.
+            <span style={{ color: item.color, textShadow: '6px 6px 0 #0a1b3d' }}>WORK</span>
+            <br />TOGETHER.
           </h1>
 
           <div className="flex flex-col gap-2" style={{ marginTop: 24 }}>
-            {[['EMAIL', 'fernandete2003pro@gmail.com'], ['LINKEDIN', 'Fernando Solórzano'], ['LOCATION', 'Spain · GMT+2']].map(([k, v]) => (
+            {[['EMAIL', 'fsolorzanopdp@gmail.com'], ['LINKEDIN', 'Fernando Solórzano', 'https://www.linkedin.com/in/fsolorzanopdp/'], ['LOCATION', 'Spain · GMT+2']].map(([k, v, url]) => (
               <div key={k} className="flex gap-4 items-baseline">
-                <span className="font-mono" style={{ fontSize: 10, letterSpacing: '0.28em', color: item.color, width: 90 }}>{k}</span>
-                <span className="font-body font-bold" style={{ fontSize: 18 }}>{v}</span>
+                <span className="font-mono" style={{ fontSize: 10, letterSpacing: '0.28em', color: item.color, width: 90 }} >{k}</span>
+                {url ? (
+                  <a href={url} target="_blank" rel="noopener noreferrer" className="font-body font-bold" style={{ fontSize: 18 }}>{v}</a>
+                ) : (
+                  <span className="font-body font-bold" style={{ fontSize: 18 }}>{v}</span>
+                )}
               </div>
             ))}
           </div>
@@ -63,8 +67,8 @@ export function ContactPage({ item, onBack, onNext, onPrev }: PageProps) {
               </div>
               {[
                 ['name', 'Your name', 'text'] as const,
-                ['org', 'Organization', 'text'] as const,
-                ['msg', 'What are you building?', 'textarea'] as const,
+                ['email', 'Email', 'text'] as const,
+                ['msg', 'What do you need?', 'textarea'] as const,
               ].map(([k, label, type]) => (
                 <label key={k} className="block" style={{ marginBottom: 14 }}>
                   <div className="font-mono uppercase" style={{ fontSize: 10, letterSpacing: '0.24em', opacity: 0.55, marginBottom: 4 }}>{label}</div>

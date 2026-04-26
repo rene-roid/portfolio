@@ -23,26 +23,29 @@ export const EXPERIENCE = {
       start: '2023-01',
       end: null, // current
       desc: 'Building custom client-facing web applications from scratch. Owning the full product cycle: frontend (React, Next.js, TypeScript) and backend (Node.js, C#).',
-      accent: '#4fd6ff',
+      accent: '#c6ff3d',
       coding: true,
+      url: "https://www.linkedin.com/company/infiniai/",
     },
     {
       role: 'Game Dev Intern',
       company: 'Tetravol',
-      start: '2022-06',
-      end: '2022-12',
+      start: '2022-10',
+      end: '2023-03',
       desc: 'Developed gameplay systems and tooling in Unity/C#. Contributed to level design pipelines and internal editor extensions.',
       accent: '#a56bff',
       coding: true,
+      url: "https://www.linkedin.com/company/tetravol/"
     },
     {
       role: 'IT Support Technician',
       company: 'Reset Soluciones',
-      start: '2021-09',
-      end: '2022-05',
-      desc: 'Network setup, hardware maintenance, and end-user support across educational campus infrastructure.',
+      start: '2021-02',
+      end: '2021-05',
+      desc: 'Network setup, hardware maintenance, and end-user support across and more!.',
       accent: '#ffd23f',
       coding: false,
+      url: "https://www.linkedin.com/company/reset-soluciones-slu/"
     },
   ],
   education: [
