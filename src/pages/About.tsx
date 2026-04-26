@@ -96,7 +96,14 @@ export function AboutPage({ item, onBack, onNext, onPrev }: PageProps) {
             marginTop: 16, maxWidth: 520,
             fontSize: 11, letterSpacing: '0.18em', color: '#a0b4d6',
           }}>
-            Based in Spain &nbsp;·&nbsp; Open to opportunities anywhere
+            Based in Barcelona &nbsp;·&nbsp;{' '}
+            {'Open to opportunities anywhere'.split('').map((char, i) => (
+              <span key={i} style={{
+                display: 'inline-block',
+                animation: `wave-gentle 10s ease-in-out infinite`,
+                animationDelay: `${i * 0.06}s`,
+              }}>{char === ' ' ? ' ' : char}</span>
+            ))}
           </p>
           <div className="flex flex-wrap gap-2" style={{ marginTop: 28 }}>
             {['React', 'Next.js', 'TypeScript', 'Node', 'SQL', 'C#'].map(t => (
