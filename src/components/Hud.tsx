@@ -103,6 +103,219 @@ function AudioVisualizer({ analyser, colorRef }: {
   );
 }
 
+function ParticleNetwork({ colorRef }: { colorRef: { current: string } }) {
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d')!;
+
+    type Particle = {
+      x: number; y: number;
+      driftX: number; driftY: number;
+      ex: number; ey: number;
+      r: number;
+      orbitDir: 1 | -1;
+    };
+    let particles: Particle[] = [];
+    let frameId: number;
+    let w = 0, h = 0;
+    let mouseX = -9999, mouseY = -9999;
+
+    const MOUSE_RADIUS = 160;
+    const ORBIT_RADIUS = 72;
+    const TANGENTIAL = 0.062;
+    const RADIAL_SPRING = 0.018;
+    const DECAY = 0.89;
+    const MAX_DIST = 140;
+
+    function resize() {
+      if (!canvas) return;
+      w = canvas.width = canvas.offsetWidth;
+      h = canvas.height = canvas.offsetHeight;
+      const count = Math.floor((w * h) / 14000);
+      particles = Array.from({ length: count }, () => ({
+        x: Math.random() * w,
+        y: Math.random() * h,
+        driftX: (Math.random() - 0.5) * 0.35,
+        driftY: (Math.random() - 0.5) * 0.35,
+        ex: 0, ey: 0,
+        r: Math.random() * 1.5 + 0.5,
+        orbitDir: (Math.random() < 0.5 ? 1 : -1) as 1 | -1,
+      }));
+    }
+    resize();
+    const ro = new ResizeObserver(resize);
+    ro.observe(canvas);
+
+    function onMouseMove(e: MouseEvent) {
+      const rect = canvas!.getBoundingClientRect();
+      mouseX = e.clientX - rect.left;
+      mouseY = e.clientY - rect.top;
+    }
+    function onMouseLeave() { mouseX = -9999; mouseY = -9999; }
+    window.addEventListener('mousemove', onMouseMove);
+    window.addEventListener('mouseleave', onMouseLeave);
+
+    type Ripple = { x: number; y: number; radius: number; };
+    let ripples: Ripple[] = [];
+    const RIPPLE_MAX = 220;
+    const RIPPLE_SPEED = 5;
+    const RING_WIDTH = 28;
+    const PUSH_FORCE = 3.2;
+
+    function onClick(e: MouseEvent) {
+      const rect = canvas!.getBoundingClientRect();
+      ripples.push({ x: e.clientX - rect.left, y: e.clientY - rect.top, radius: 0 });
+    }
+    window.addEventListener('click', onClick);
+
+    function draw() {
+      frameId = requestAnimationFrame(draw);
+      ctx.clearRect(0, 0, w, h);
+
+      const hex = colorRef.current;
+      const hh = hex.replace('#', '');
+      const r = parseInt(hh.slice(0, 2), 16) || 79;
+      const g = parseInt(hh.slice(2, 4), 16) || 214;
+      const b = parseInt(hh.slice(4, 6), 16) || 255;
+
+      for (const p of particles) {
+        const dx = mouseX - p.x;
+        const dy = mouseY - p.y;
+        const dist = Math.sqrt(dx * dx + dy * dy);
+        if (dist < MOUSE_RADIUS && dist > 1) {
+          const rx = dx / dist;
+          const ry = dy / dist;
+          // tangential (perpendicular) force — creates orbit
+          const tx = -ry * p.orbitDir;
+          const ty =  rx * p.orbitDir;
+          const tStr = TANGENTIAL * (1 - dist / MOUSE_RADIUS);
+          p.ex += tx * tStr;
+          p.ey += ty * tStr;
+          // radial spring — pulls toward ORBIT_RADIUS distance
+          const spring = RADIAL_SPRING * (dist - ORBIT_RADIUS) / ORBIT_RADIUS;
+          p.ex += rx * spring;
+          p.ey += ry * spring;
+        }
+        p.ex *= DECAY;
+        p.ey *= DECAY;
+
+        p.x += p.driftX + p.ex;
+        p.y += p.driftY + p.ey;
+        if (p.x < 0) p.x += w;
+        if (p.x > w) p.x -= w;
+        if (p.y < 0) p.y += h;
+        if (p.y > h) p.y -= h;
+      }
+
+      // particle–particle lines
+      for (let i = 0; i < particles.length; i++) {
+        for (let j = i + 1; j < particles.length; j++) {
+          const dx = particles[i].x - particles[j].x;
+          const dy = particles[i].y - particles[j].y;
+          const dist = Math.sqrt(dx * dx + dy * dy);
+          if (dist < MAX_DIST) {
+            const alpha = (1 - dist / MAX_DIST) * 0.22;
+            ctx.beginPath();
+            ctx.moveTo(particles[i].x, particles[i].y);
+            ctx.lineTo(particles[j].x, particles[j].y);
+            ctx.strokeStyle = `rgba(${r},${g},${b},${alpha.toFixed(3)})`;
+            ctx.lineWidth = 0.6;
+            ctx.stroke();
+          }
+        }
+      }
+
+      // cursor–particle lines
+      if (mouseX > -1000) {
+        for (const p of particles) {
+          const dx = mouseX - p.x;
+          const dy = mouseY - p.y;
+          const dist = Math.sqrt(dx * dx + dy * dy);
+          if (dist < MOUSE_RADIUS) {
+            const t = 1 - dist / MOUSE_RADIUS;
+            const alpha = t * 0.55;
+            const lw = 0.5 + t * 1.2;
+            ctx.beginPath();
+            ctx.moveTo(p.x, p.y);
+            ctx.lineTo(mouseX, mouseY);
+            ctx.strokeStyle = `rgba(${r},${g},${b},${alpha.toFixed(3)})`;
+            ctx.lineWidth = lw;
+            ctx.stroke();
+          }
+        }
+      }
+
+      // ripple physics + drawing
+      for (const rip of ripples) {
+        rip.radius += RIPPLE_SPEED;
+
+        // push particles as ring front passes through them
+        for (const p of particles) {
+          const dx = p.x - rip.x;
+          const dy = p.y - rip.y;
+          const dist = Math.sqrt(dx * dx + dy * dy);
+          const delta = dist - rip.radius;
+          if (delta > -RING_WIDTH && delta < RING_WIDTH * 0.5 && dist > 0) {
+            const envelope = 1 - Math.abs(delta) / RING_WIDTH;
+            const force = envelope * PUSH_FORCE;
+            p.ex += (dx / dist) * force;
+            p.ey += (dy / dist) * force;
+          }
+        }
+
+        // draw outer ring
+        const t = rip.radius / RIPPLE_MAX;
+        const alpha = (1 - t) * 0.65;
+        ctx.beginPath();
+        ctx.arc(rip.x, rip.y, rip.radius, 0, Math.PI * 2);
+        ctx.strokeStyle = `rgba(${r},${g},${b},${alpha.toFixed(3)})`;
+        ctx.lineWidth = 1.5 * (1 - t) + 0.5;
+        ctx.stroke();
+
+        // draw trailing inner ring (secondary water drop wave)
+        const r2 = rip.radius * 0.62;
+        const t2 = r2 / RIPPLE_MAX;
+        const a2 = (1 - t2) * 0.3;
+        ctx.beginPath();
+        ctx.arc(rip.x, rip.y, r2, 0, Math.PI * 2);
+        ctx.strokeStyle = `rgba(${r},${g},${b},${a2.toFixed(3)})`;
+        ctx.lineWidth = 0.8;
+        ctx.stroke();
+      }
+      ripples = ripples.filter(rip => rip.radius < RIPPLE_MAX);
+
+      // particles
+      for (const p of particles) {
+        const speed = Math.sqrt(p.ex * p.ex + p.ey * p.ey);
+        const boost = Math.min(speed * 4, 1);
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.r + boost, 0, Math.PI * 2);
+        ctx.fillStyle = `rgba(${r},${g},${b},${(0.45 + boost * 0.4).toFixed(3)})`;
+        ctx.fill();
+      }
+    }
+
+    draw();
+    return () => {
+      cancelAnimationFrame(frameId);
+      ro.disconnect();
+      window.removeEventListener('mousemove', onMouseMove);
+      window.removeEventListener('mouseleave', onMouseLeave);
+      window.removeEventListener('click', onClick);
+    };
+  }, [colorRef]);
+
+  return (
+    <canvas
+      ref={canvasRef}
+      style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', pointerEvents: 'none' }}
+    />
+  );
+}
+
 export function BackgroundField({ hue = 'blue', accentColor }: {
   hue?: Hue;
   accentColor?: string;
@@ -128,18 +341,7 @@ export function BackgroundField({ hue = 'blue', accentColor }: {
         background: 'linear-gradient(315deg, #ffffff18, transparent 70%)',
         filter: 'blur(60px)', mixBlendMode: 'screen',
       }} />
-      <svg className="absolute inset-0 w-full h-full" style={{ opacity: 0.18 }}>
-        <defs>
-          <pattern id="bg-grid" width="48" height="48" patternUnits="userSpaceOnUse">
-            <path d="M 48 0 L 0 0 0 48" fill="none" stroke="#ffffff" strokeWidth="0.5" />
-          </pattern>
-        </defs>
-        <rect width="100%" height="100%" fill="url(#bg-grid)" />
-      </svg>
-      <div className="absolute inset-0 pointer-events-none" style={{
-        backgroundImage: 'repeating-linear-gradient(0deg, rgba(255,255,255,0.03) 0 1px, transparent 1px 3px)',
-        mixBlendMode: 'overlay',
-      }} />
+      <ParticleNetwork colorRef={colorRef} />
       <svg className="absolute inset-0 w-full h-full" style={{ opacity: 0.08, mixBlendMode: 'overlay' }}>
         <filter id="noise"><feTurbulence baseFrequency="0.9" numOctaves="2" stitchTiles="stitch" /></filter>
         <rect width="100%" height="100%" filter="url(#noise)" />
