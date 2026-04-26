@@ -8,7 +8,7 @@ class AudioPlayerSingleton {
   private _analyser: AnalyserNode | null = null;
   private gainNode: GainNode | null = null;
   private _playing = false;
-  private _volume = 0.09;
+  private _volume = 0.4;
   private _progress = 0;
   private listeners = new Set<Listener>();
   private initialized = false;

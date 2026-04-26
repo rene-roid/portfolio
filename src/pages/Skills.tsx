@@ -8,7 +8,7 @@ export function SkillsPage({ item, onBack, onNext, onPrev }: PageProps) {
       <div className="flex flex-col h-full gap-6">
         <div>
           <div className="font-mono uppercase" style={{ fontSize: 11, letterSpacing: '0.28em', opacity: 0.7 }}>
-            // skills.compile( )
+            // skills.compile()
           </div>
           <div className="font-display italic" style={{
             marginTop: 6,

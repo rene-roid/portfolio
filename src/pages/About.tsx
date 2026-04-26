@@ -1,6 +1,8 @@
 import { useState, useEffect } from 'react';
 import type { PageProps } from "../types";
 import { PageShell, StyledCard } from "../components/PageShell";
+import { EXPERIENCE } from '../data';
+import { computeCodingExperience } from '../utils';
 
 const SHINE_INTERVAL  = 0.07;   // seconds between each char glint peak
 const SHINE_DURATION  = 0.35;
@@ -29,7 +31,7 @@ function AnimatedHeadline({ color }: { color: string }) {
     const idx = gi++;
     const isSpace = char === ' ';
     // cycle 0 = waiting for first trigger (chars sit still); cycle >= 1 = playing
-    const base       = cycle === 0 ? 9999 : 0;  // push delays into the future until first trigger
+    const base = cycle === 0 ? 9999 : 0;  // push delays into the future until first trigger
     const shineDelay = base + idx * SHINE_INTERVAL;
     const waveDelay  = base + WAVE_START + idx * 0.05;
     return (
@@ -110,7 +112,12 @@ export function AboutPage({ item, onBack, onNext, onPrev }: PageProps) {
           <StyledCard accent="#4fd6ff">
             <div className="font-mono uppercase" style={{ fontSize: 10, letterSpacing: '0.28em', opacity: 0.6 }}>PREVIOUSLY</div>
             <div className="font-display italic" style={{ fontSize: 22, marginTop: 6 }}>Tetravol · Campus Net</div>
-            <div style={{ opacity: 0.7, marginTop: 4, fontSize: 14 }}>Game dev internship · CFGS DAW + CFGM SMR</div>
+            <div style={{ opacity: 0.7, marginTop: 4, fontSize: 14 }}>Game dev internship · IT Support</div>
+          </StyledCard>
+          <StyledCard accent="#ff3b8a">
+            <div className="font-mono uppercase" style={{ fontSize: 10, letterSpacing: '0.28em', opacity: 0.6 }}>EDUCATION</div>
+            <div className="font-display italic" style={{ fontSize: 20, marginTop: 6, lineHeight: 1.2 }}>{EXPERIENCE.education[0].title}</div>
+            <div className="font-mono uppercase" style={{ fontSize: 11, letterSpacing: '0.18em', marginTop: 4, color: '#ff3b8a' }}>{EXPERIENCE.education[0].institution} · {EXPERIENCE.education[0].period}</div>
           </StyledCard>
           <StyledCard accent="#ffd23f">
             <div className="font-mono uppercase" style={{ fontSize: 10, letterSpacing: '0.28em', opacity: 0.6 }}>IN PURSUIT OF</div>
@@ -119,7 +126,7 @@ export function AboutPage({ item, onBack, onNext, onPrev }: PageProps) {
             </div>
           </StyledCard>
           <div className="grid gap-2" style={{ gridTemplateColumns: 'repeat(3,1fr)', marginTop: 4 }}>
-            {[['EXP', '03 YRS'], ['DOMAIN', 'WEB'], ['STACK', 'FULL']].map(([k, v]) => (
+            {[['CODING EXPERIENCE', computeCodingExperience(EXPERIENCE.jobs, EXPERIENCE.education)], ['DOMAIN', 'WEB'], ['STACK', 'FULL']].map(([k, v]) => (
               <div key={k} style={{
                 border: '1px solid rgba(255,255,255,0.2)', padding: 14,
                 background: 'rgba(255,255,255,0.03)',

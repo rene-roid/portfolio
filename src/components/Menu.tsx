@@ -39,7 +39,7 @@ function IntroPanel({ hoveredItem }: { hoveredItem: MenuItem | null }) {
         HI, I'M
       </div>
 
-      {/* KAI VANCE. — with accent bar */}
+      {/* accent bar */}
       <div className="relative" style={{
         marginTop: 6, marginLeft: 10,
         opacity: step >= 3 ? 1 : 0,
