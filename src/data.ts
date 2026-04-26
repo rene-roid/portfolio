@@ -47,7 +47,7 @@ export const EXPERIENCE = {
   ],
   education: [
     {
-      title: 'CFGS DAM — Web Application Development',
+      title: 'CFGS DAM — Software Development for Applications and GameDev',
       institution: 'Campus Net',
       period: '2021 — 2023',
       start: '2021-09',
@@ -57,7 +57,7 @@ export const EXPERIENCE = {
     },
     {
       title: 'CFGM SMR — Microcomputer Systems & Networks',
-      institution: 'Institut Tecnològic',
+      institution: 'Salesians Sarrià',
       period: '2019 — 2021',
       start: '2019-09',
       end: '2021-06',

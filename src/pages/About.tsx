@@ -85,16 +85,21 @@ export function AboutPage({ item, onBack, onNext, onPrev }: PageProps) {
           </h1>
           <p className="font-body" style={{
             marginTop: 28, maxWidth: 520,
-            fontSize: 16, lineHeight: 1.55, color: '#d9e6ff',
+            fontSize: 16, lineHeight: 1.7, color: '#d9e6ff',
+            fontWeight: 'bold'
           }}>
-            Full stack developer with nearly three years of professional experience
-            building custom web applications for clients from scratch. I own the
-            frontend — React and Next.js with TypeScript — and jump into backend
-            when needed. Started from game dev, ended up loving the web. Based in
-            Spain. Open to new opportunities.
+            Full-stack developer with nearly three years of professional experience building
+            custom web apps for clients from scratch. Frontend-first — React, Next.js, TypeScript —
+            and jump into backend when the job needs it. Started in game dev, ended up loving the web.
+          </p>
+          <p className="font-mono uppercase" style={{
+            marginTop: 16, maxWidth: 520,
+            fontSize: 11, letterSpacing: '0.18em', color: '#a0b4d6',
+          }}>
+            Based in Spain &nbsp;·&nbsp; Open to opportunities anywhere
           </p>
           <div className="flex flex-wrap gap-2" style={{ marginTop: 28 }}>
-            {['React', 'Next.js', 'TypeScript', 'Node.js', 'C#', 'SQL'].map(t => (
+            {['React', 'Next.js', 'TypeScript', 'Node', 'SQL', 'C#'].map(t => (
               <span key={t} className="font-mono uppercase" style={{
                 fontSize: 11, letterSpacing: '0.18em',
                 padding: '6px 12px', border: `1px solid ${item.color}`, color: item.color,
