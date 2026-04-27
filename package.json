@@ -10,12 +10,15 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@types/three": "^0.184.0",
     "react": "^19.2.5",
     "react-dom": "^19.2.5",
+    "react-force-graph": "^1.48.2",
     "react-markdown": "^10.1.0",
     "react-router-dom": "^7.14.2",
     "remark-gfm": "^4.0.1",
-    "remark-unwrap-images": "^4.0.1"
+    "remark-unwrap-images": "^4.0.1",
+    "three": "^0.184.0"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",
