@@ -94,8 +94,8 @@ export default function App() {
 
   const chargeAccum = useRef(0);
   const chargeDir = useRef<'next' | 'prev'>('next');
-  const decayTimer = useRef<ReturnType<typeof setTimeout>>();
-  const fadeTimer = useRef<ReturnType<typeof setTimeout>>();
+  const decayTimer = useRef<ReturnType<typeof setTimeout>>(undefined);
+  const fadeTimer = useRef<ReturnType<typeof setTimeout>>(undefined);
   const navIndexRef = useRef(0);
   const pendingRef = useRef<string | null>(null);
 
@@ -121,8 +121,9 @@ export default function App() {
   }, [pending]);
 
   const navIndex = NAV_ORDER.indexOf(routeId);
-  navIndexRef.current = navIndex;
-  pendingRef.current = pending;
+
+  useEffect(() => { navIndexRef.current = navIndex; }, [navIndex]);
+  useEffect(() => { pendingRef.current = pending; }, [pending]);
 
   const goNext = useCallback(() => {
     if (navIndex < NAV_ORDER.length - 1) {
