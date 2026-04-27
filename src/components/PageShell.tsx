@@ -206,7 +206,7 @@ export function PageShell({ item, onBack, onNext, onPrev, children }: {
         </Reveal>
       </CornerBracket>
 
-      <div className="absolute overflow-hidden z-4" style={{ inset: '110px 8% 110px 8%' }}>
+      <div className="absolute overflow-visible z-4" style={{ inset: '110px 8% 110px 8%' }}>
         <Reveal delay={220} from="up" dist={40} dur={480} style={{height: '100%'}}>
           {children}
         </Reveal>
