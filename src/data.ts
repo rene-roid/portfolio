@@ -1,51 +1,11 @@
-import type {MenuItem} from './types';
+import type { MenuItem } from './types';
 
 export const MENU_ITEMS: MenuItem[] = [
-  {
-    id: 'about',
-    label: 'ABOUT ME',
-    sub: 'The Developer',
-    color: '#ff3b8a',
-    hue: 'crimson',
-    transition: 'slash',
-    command: 'Read Profile'
-  },
-  {
-    id: 'experience',
-    label: 'EXPERIENCE',
-    sub: 'The Résumé',
-    color: '#a56bff',
-    hue: 'violet',
-    transition: 'bars',
-    command: 'Browse Résumé'
-  },
-  {
-    id: 'projects',
-    label: 'PROJECTS',
-    sub: 'Projects',
-    color: '#4fd6ff',
-    hue: 'teal',
-    transition: 'bars',
-    command: 'Browse Projects'
-  },
-  {
-    id: 'skills',
-    label: 'SKILLS',
-    sub: 'Stack & Toolkit',
-    color: '#ffd23f',
-    hue: 'amber',
-    transition: 'stripe',
-    command: 'Read Skills'
-  },
-  {
-    id: 'contact',
-    label: 'CONTACT',
-    sub: 'Send a Signal',
-    color: '#ff7a3a',
-    hue: 'crimson',
-    transition: 'slash',
-    command: 'Open Channel'
-  },
+  { id: 'about',   label: 'ABOUT ME',   sub: 'The Developer',   color: '#ff3b8a', hue: 'crimson', transition: 'slash',  command: 'PROFILE' },
+  { id: 'experience', label: 'EXPERIENCE', sub: 'The Résumé',     color: '#a56bff', hue: 'violet',  transition: 'bars',   command: 'EXPERIENCE' },
+  { id: 'projects',    label: 'PROJECTS',    sub: 'Projects',        color: '#4fd6ff', hue: 'teal',    transition: 'bars',   command: 'Browse Projects' },
+  { id: 'skills',  label: 'SKILLS',  sub: 'Stack & Toolkit', color: '#ffd23f', hue: 'amber',   transition: 'stripe', command: 'Skills' },
+  { id: 'contact', label: 'CONTACT', sub: 'Send a Signal',   color: '#ff7a3a', hue: 'crimson', transition: 'slash',  command: 'CONTACT' },
 ];
 
 export type ProjectBlock =

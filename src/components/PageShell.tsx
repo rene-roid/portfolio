@@ -56,6 +56,20 @@ export function StyledCard({ accent = '#4fd6ff', children, pad = 20, style }: {
 
 function NavArrow({ dir, onClick, color }: { dir: 'prev' | 'next'; onClick: () => void; color: string }) {
   const isPrev = dir === 'prev';
+  const [nudge, setNudge] = useState(false);
+  const [hovered, setHovered] = useState(false);
+
+  useEffect(() => {
+    const offset = isPrev ? 10000 : 11000;
+    let interval: ReturnType<typeof setInterval>;
+    const initial = setTimeout(() => {
+      const run = () => { setNudge(true); setTimeout(() => setNudge(false), 900); };
+      run();
+      interval = setInterval(run, 20000);
+    }, offset);
+    return () => { clearTimeout(initial); clearInterval(interval); };
+  }, [isPrev]);
+
   return (
     <button
       onClick={onClick}
@@ -64,14 +78,16 @@ function NavArrow({ dir, onClick, color }: { dir: 'prev' | 'next'; onClick: () =
         [isPrev ? 'left' : 'right']: 18,
         top: '50%',
         transform: 'translateY(-50%)',
+        animation: nudge ? `${isPrev ? 'nav-hint-left' : 'nav-hint-right'} 880ms cubic-bezier(.4,0,.2,1) forwards` : 'none',
         background: 'transparent',
         border: 'none',
         padding: '12px 8px',
-        opacity: 0.45,
+        opacity: hovered ? 1 : 0.45,
         transition: 'opacity 150ms',
+        filter: hovered ? 'brightness(1.6)' : undefined,
       }}
-      onMouseEnter={e => { (e.currentTarget as HTMLButtonElement).style.opacity = '1'; }}
-      onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.opacity = '0.45'; }}
+      onMouseEnter={() => setHovered(true)}
+      onMouseLeave={() => setHovered(false)}
     >
       <div className="font-display italic" style={{
         fontSize: 28,
@@ -87,6 +103,75 @@ function NavArrow({ dir, onClick, color }: { dir: 'prev' | 'next'; onClick: () =
       }}>
         {isPrev ? 'PREV' : 'NEXT'}
       </div>
+    </button>
+  );
+}
+
+function BackButton({ color, onClick }: { color: string; onClick: () => void }) {
+  const [hovered, setHovered] = useState(false);
+  const [pressed, setPressed] = useState(false);
+  const [flash, setFlash] = useState(0); // 0=off 1=white 2=color 3=fade
+
+  function handleClick() {
+    setPressed(true);
+    setFlash(1);
+    setTimeout(() => setFlash(2), 80);
+    setTimeout(() => setFlash(3), 180);
+    setTimeout(() => { setFlash(0); setPressed(false); onClick(); }, 420);
+  }
+
+  return (
+    <button
+      onClick={handleClick}
+      onMouseEnter={() => setHovered(true)}
+      onMouseLeave={() => setHovered(false)}
+      className="font-display italic cursor-pointer relative overflow-hidden"
+      style={{
+        background: 'transparent',
+        border: `2px solid ${color}`,
+        color: hovered ? '#0a1b3d' : '#fff',
+        fontSize: 16,
+        letterSpacing: '-0.01em',
+        padding: '10px 22px 10px 32px',
+        transform: pressed
+          ? 'skewX(-10deg) scale(0.88) translateX(-6px)'
+          : 'skewX(-10deg) scale(1) translateX(0)',
+        transition: pressed
+          ? 'color 350ms ease, transform 100ms cubic-bezier(.4,0,.2,1)'
+          : 'color 350ms ease, transform 280ms cubic-bezier(.2,1.6,.4,1)',
+        zIndex: 0,
+        boxShadow: pressed ? `0 0 18px 4px ${color}88` : '0 0 0px 0px transparent',
+      }}
+    >
+      {/* fill sweep right→left */}
+      <span
+        aria-hidden
+        style={{
+          position: 'absolute',
+          inset: 0,
+          background: color,
+          transform: hovered ? 'scaleX(1)' : 'scaleX(0)',
+          transformOrigin: 'right center',
+          transition: hovered
+            ? 'transform 380ms cubic-bezier(.7,0,.1,1)'
+            : 'transform 260ms cubic-bezier(.9,0,.3,1)',
+          zIndex: -1,
+        }}
+      />
+      {/* flash overlay: white burst → color burst → fade */}
+      <span
+        aria-hidden
+        style={{
+          position: 'absolute',
+          inset: 0,
+          background: flash === 1 ? '#fff' : color,
+          opacity: flash === 0 ? 0 : flash === 3 ? 0 : 0.55,
+          transition: flash === 1 ? 'opacity 0ms' : flash === 2 ? 'opacity 60ms' : 'opacity 220ms ease',
+          zIndex: 1,
+          pointerEvents: 'none',
+        }}
+      />
+      <span style={{ position: 'relative', zIndex: 2 }}>◂ BACK</span>
     </button>
   );
 }
@@ -132,26 +217,7 @@ export function PageShell({ item, onBack, onNext, onPrev, children }: {
 
       <CornerBracket corner="bl">
         <Reveal delay={300} from="left">
-          <button
-            onClick={onBack}
-            className="font-display italic cursor-pointer relative overflow-hidden"
-            style={{
-              background: 'transparent', border: `2px solid ${item.color}`,
-              color: '#fff', fontSize: 16, letterSpacing: '-0.01em',
-              padding: '10px 22px 10px 32px', transform: 'skewX(-10deg)',
-              transition: 'background 150ms, color 150ms',
-            }}
-            onMouseEnter={e => {
-              (e.currentTarget as HTMLButtonElement).style.background = item.color;
-              (e.currentTarget as HTMLButtonElement).style.color = '#0a1b3d';
-            }}
-            onMouseLeave={e => {
-              (e.currentTarget as HTMLButtonElement).style.background = 'transparent';
-              (e.currentTarget as HTMLButtonElement).style.color = '#fff';
-            }}
-          >
-            ◂ BACK
-          </button>
+          <BackButton color={item.color} onClick={onBack} />
         </Reveal>
       </CornerBracket>
     </div>

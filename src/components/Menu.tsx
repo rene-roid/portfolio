@@ -318,6 +318,7 @@ export function MainMenu({ onSelect }: { onSelect: (item: MenuItem) => void }) {
           <div>welcome to my portfolio!! :D</div>
         </div>
       </CornerBracket>
+
     </div>
   );
 }
