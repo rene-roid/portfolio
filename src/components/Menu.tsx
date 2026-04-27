@@ -9,10 +9,9 @@ function IntroPanel({ hoveredItem }: { hoveredItem: MenuItem | null }) {
   const [glitching, setGlitching] = useState(false);
   const glitchTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  // Step animations start after boot scan completes (~650ms)
+  // Intro starts immediately — steps lead the scan line
   useEffect(() => {
-    const base = 650;
-    const seq = [180, 320, 480, 650, 850].map(t => t + base);
+    const seq = [180, 320, 480, 650, 900];
     const ids = seq.map((t, i) => setTimeout(() => setStep(i + 1), t));
     return () => ids.forEach(clearTimeout);
   }, []);
@@ -113,19 +112,22 @@ function IntroPanel({ hoveredItem }: { hoveredItem: MenuItem | null }) {
 const hoverSfx = new Audio('/hovertft.mp3');
 hoverSfx.volume = 0.4;
 
-function MenuItemRow({ item, index, isActive, onHover, onClick }: {
+function MenuItemRow({ item, index, isActive, onHover, onClick, menuReady = false }: {
   item: MenuItem;
   index: number;
   isActive: boolean;
   onHover: (id: string | null) => void;
   onClick: (item: MenuItem) => void;
+  menuReady?: boolean;
 }) {
   const [entered, setEntered] = useState(false);
 
   useEffect(() => {
-    const id = setTimeout(() => setEntered(true), 100 + index * 60);
+    if (!menuReady) return;
+    // menuReady is one-way (false→true once), so this timer fires exactly once per item
+    const id = setTimeout(() => setEntered(true), 200 + index * 85);
     return () => clearTimeout(id);
-  }, [index]);
+  }, [menuReady, index]);
 
   function playHover() {
     hoverSfx.currentTime = 0;
@@ -144,9 +146,11 @@ function MenuItemRow({ item, index, isActive, onHover, onClick }: {
         marginLeft: indent,
         marginTop: index === 0 ? 0 : -10,
         padding: '2px 0',
-        transform: entered ? `translateX(${isActive ? 24 : 0}px)` : 'translateX(-60px)',
+        transform: entered ? `translateX(${isActive ? 24 : 0}px)` : 'translateX(-50px)',
         opacity: entered ? 1 : 0,
-        transition: 'transform 180ms cubic-bezier(.7,0,.2,1.6), opacity 220ms ease',
+        transition: entered
+          ? 'transform 400ms cubic-bezier(0.16,1,0.3,1), opacity 300ms ease-out'
+          : 'transform 180ms cubic-bezier(.7,0,.2,1), opacity 180ms ease',
         willChange: 'transform,opacity',
       }}
     >
@@ -218,11 +222,22 @@ export function MainMenu({ onSelect }: { onSelect: (item: MenuItem) => void }) {
   const [mouseHovered, setMouseHovered] = useState<string | null>(null);
   const [keyIndex, setKeyIndex] = useState<number>(-1);
   const [scanning, setScanning] = useState(true);
+  const [menuReady, setMenuReady] = useState(false);
+  const [menuScan, setMenuScan] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
 
+  // Boot flash only — no scan line at startup
   useEffect(() => {
     const id = setTimeout(() => setScanning(false), 700);
     return () => clearTimeout(id);
+  }, []);
+
+  // Menu scan line starts after flash, then menu items animate in, then scan line goes away
+  useEffect(() => {
+    const t1 = setTimeout(() => setMenuScan(true), 550);
+    const t2 = setTimeout(() => setMenuReady(true), 700);
+    const t3 = setTimeout(() => setMenuScan(false), 400 + 700);
+    return () => { clearTimeout(t1); clearTimeout(t2); clearTimeout(t3); };
   }, []);
 
   useEffect(() => {
@@ -257,6 +272,11 @@ export function MainMenu({ onSelect }: { onSelect: (item: MenuItem) => void }) {
       {scanning && (
         <div style={{ position: 'absolute', inset: 0, zIndex: 99, pointerEvents: 'none', overflow: 'hidden' }}>
           <div style={{ position: 'absolute', inset: 0 }} className="boot-flash" />
+        </div>
+      )}
+
+      {menuScan && (
+        <div style={{ position: 'absolute', inset: 0, zIndex: 99, pointerEvents: 'none', overflow: 'hidden' }}>
           <div className="boot-scan-line" />
         </div>
       )}
@@ -280,12 +300,18 @@ export function MainMenu({ onSelect }: { onSelect: (item: MenuItem) => void }) {
 
       {/* right: menu stack */}
       <div className="absolute flex flex-col items-start z-4" style={{ right: '6%', top: '50%', transform: 'translateY(-50%)' }}>
-        <div className="relative" style={{ marginLeft: 0, marginBottom: 8, transform: 'skewX(-8deg)' }}>
+        <div className="relative" style={{
+          marginLeft: 0, marginBottom: 8,
+          opacity: menuReady ? 1 : 0,
+          transform: menuReady ? 'skewX(-8deg) translateX(0)' : 'skewX(-8deg) translateX(30px)',
+          transition: 'opacity 350ms ease-out, transform 400ms cubic-bezier(0.16,1,0.3,1)',
+        }}>
           <div className="absolute" style={{
             left: -20, right: -30, top: '42%', height: '28%',
             background: current?.color ?? '#ff3b8a',
-            transform: 'skewX(6deg)',
-            transition: 'background 200ms',
+            transform: menuReady ? 'skewX(6deg) scaleX(1)' : 'skewX(6deg) scaleX(0)',
+            transformOrigin: 'right center',
+            transition: 'background 200ms, transform 450ms cubic-bezier(0.16,1,0.3,1)',
             zIndex: 0,
           }} />
           <div className="relative font-display italic z-1" style={{
@@ -301,6 +327,7 @@ export function MainMenu({ onSelect }: { onSelect: (item: MenuItem) => void }) {
             isActive={item.id === activeId}
             onHover={handleMouseHover}
             onClick={onSelect}
+            menuReady={menuReady}
           />
         ))}
       </div>

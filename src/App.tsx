@@ -11,6 +11,60 @@ import { SkillsPage } from './pages/Skills';
 import { ProjectsPage } from './pages/Projects';
 import { ContactPage } from './pages/Contact';
 
+function ScrollChargeBar({ charge, visible, color, dir, discharging }: {
+  charge: number;
+  visible: boolean;
+  color: string;
+  dir: 'next' | 'prev';
+  discharging: boolean;
+}) {
+  return (
+    <div style={{
+      position: 'fixed',
+      bottom: 32,
+      left: '50%',
+      transform: 'translateX(-50%)',
+      zIndex: 200,
+      opacity: visible ? 1 : 0,
+      transition: 'opacity 300ms ease',
+      pointerEvents: 'none',
+      display: 'flex',
+      flexDirection: 'column',
+      alignItems: 'center',
+      gap: 7,
+    }}>
+      <div style={{
+        fontFamily: 'monospace',
+        fontSize: 9,
+        letterSpacing: '0.22em',
+        color,
+        opacity: 0.85,
+        textTransform: 'uppercase',
+      }}>
+        {dir === 'next' ? '▼ NEXT' : '▲ PREV'}
+      </div>
+      <div style={{
+        width: 180,
+        height: 2,
+        background: 'rgba(255,255,255,0.10)',
+        borderRadius: 2,
+        overflow: 'hidden',
+      }}>
+        <div style={{
+          height: '100%',
+          width: `${charge * 100}%`,
+          background: color,
+          boxShadow: `0 0 10px 2px ${color}88`,
+          borderRadius: 2,
+          transition: discharging
+            ? 'width 500ms cubic-bezier(.9,0,.1,1)'
+            : 'width 60ms linear',
+        }} />
+      </div>
+    </div>
+  );
+}
+
 interface TransState {
   kind: string;
   color: string;
@@ -32,7 +86,20 @@ export default function App() {
   const location = useLocation();
   const [pending, setPending] = useState<string | null>(null);
   const [trans, setTrans] = useState<TransState | null>(null);
-  const wheelLock = useRef(false);
+
+  const [barCharge, setBarCharge] = useState(0);
+  const [barVisible, setBarVisible] = useState(false);
+  const [barDir, setBarDir] = useState<'next' | 'prev'>('next');
+  const [barDischarging, setBarDischarging] = useState(false);
+
+  const chargeAccum = useRef(0);
+  const chargeDir = useRef<'next' | 'prev'>('next');
+  const decayTimer = useRef<ReturnType<typeof setTimeout>>();
+  const fadeTimer = useRef<ReturnType<typeof setTimeout>>();
+  const navIndexRef = useRef(0);
+  const pendingRef = useRef<string | null>(null);
+
+  const CHARGE_THRESHOLD = 620;
 
   useEffect(() => { audioPlayer.init(); }, []);
 
@@ -54,6 +121,8 @@ export default function App() {
   }, [pending]);
 
   const navIndex = NAV_ORDER.indexOf(routeId);
+  navIndexRef.current = navIndex;
+  pendingRef.current = pending;
 
   const goNext = useCallback(() => {
     if (navIndex < NAV_ORDER.length - 1) {
@@ -69,19 +138,61 @@ export default function App() {
     }
   }, [navIndex, go]);
 
-  // Wheel → page scroll navigation
+  // Wheel → charge bar → navigate
   useEffect(() => {
-    function onWheel(e: WheelEvent) {
-      if (wheelLock.current || pending) return;
-      if (Math.abs(e.deltaY) < 20) return;
-      wheelLock.current = true;
-      setTimeout(() => { wheelLock.current = false; }, 900);
-      if (e.deltaY > 0) goNext();
-      else goPrev();
+    function discharge() {
+      setBarDischarging(true);
+      setBarCharge(0);
+      clearTimeout(fadeTimer.current);
+      fadeTimer.current = setTimeout(() => setBarVisible(false), 550);
     }
+
+    function onWheel(e: WheelEvent) {
+      if (pendingRef.current) return;
+      if (Math.abs(e.deltaY) < 5) return;
+
+      const dir: 'next' | 'prev' = e.deltaY > 0 ? 'next' : 'prev';
+      const idx = navIndexRef.current;
+
+      if (dir === 'next' && idx >= NAV_ORDER.length - 1) return;
+      if (dir === 'prev' && idx <= 0) return;
+
+      // direction flip → reset
+      if (dir !== chargeDir.current) {
+        chargeAccum.current = 0;
+        chargeDir.current = dir;
+      }
+
+      clearTimeout(decayTimer.current);
+      clearTimeout(fadeTimer.current);
+
+      chargeAccum.current = Math.min(chargeAccum.current + Math.abs(e.deltaY), CHARGE_THRESHOLD);
+      const ratio = chargeAccum.current / CHARGE_THRESHOLD;
+
+      setBarDir(dir);
+      setBarDischarging(false);
+      setBarCharge(ratio);
+      setBarVisible(true);
+
+      if (chargeAccum.current >= CHARGE_THRESHOLD) {
+        chargeAccum.current = 0;
+        setBarCharge(0);
+        setTimeout(() => setBarVisible(false), 120);
+        if (dir === 'next') goNext();
+        else goPrev();
+        return;
+      }
+
+      decayTimer.current = setTimeout(discharge, 600);
+    }
+
     window.addEventListener('wheel', onWheel, { passive: true });
-    return () => window.removeEventListener('wheel', onWheel);
-  }, [goNext, goPrev, pending]);
+    return () => {
+      window.removeEventListener('wheel', onWheel);
+      clearTimeout(decayTimer.current);
+      clearTimeout(fadeTimer.current);
+    };
+  }, [goNext, goPrev]);
 
   function onCoverDone() {
     navigate(pending!);
@@ -126,6 +237,14 @@ export default function App() {
           onDone={trans.phase === 'cover' ? onCoverDone : onRevealDone}
         />
       )}
+
+      <ScrollChargeBar
+        charge={barCharge}
+        visible={barVisible}
+        color={(currentItem?.color) ?? '#4fd6ff'}
+        dir={barDir}
+        discharging={barDischarging}
+      />
     </div>
   );
 }
