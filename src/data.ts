@@ -9,7 +9,7 @@ export const MENU_ITEMS: MenuItem[] = [
 ];
 
 export const PROJECTS = [
-  { name: 'PROJECT 01', role: 'Full Stack · 2024', tag: 'Client tooling',    accent: '#4fd6ff', desc: 'TODO — add project description, tech stack, and link.' },
+  { name: 'PROJECT 01', role: 'Full Stack · 2024', tag: 'Game development',    accent: '#4fd6ff', desc: 'TODO — add project description, tech stack, and link.' },
   { name: 'PROJECT 02', role: 'Frontend · 2024',   tag: 'Web application',   accent: '#ff3b8a', desc: 'TODO — add project description, tech stack, and link.' },
   { name: 'PROJECT 03', role: 'Frontend · 2023',   tag: 'Web application',   accent: '#ffd23f', desc: 'TODO — add project description, tech stack, and link.' },
   { name: 'SIDE PROJECT', role: 'Personal · 2024', tag: 'Side project',      accent: '#c6ff3d', desc: 'TODO — add project description, tech stack, and link.' },
@@ -32,8 +32,8 @@ export const EXPERIENCE = {
       company: 'Tetravol',
       start: '2022-10',
       end: '2023-03',
-      desc: 'Developed gameplay systems and tooling in Unity/C#. Contributed to level design pipelines and internal editor extensions.',
-      accent: '#a56bff',
+      desc: 'Developed virtual and augmented reality games in Unity/C#. Contributed in web based game development and educational games for institutions.',
+      accent: '#ff4141',
       coding: true,
       url: "https://www.linkedin.com/company/tetravol/"
     },
@@ -43,7 +43,7 @@ export const EXPERIENCE = {
       start: '2021-02',
       end: '2021-05',
       desc: 'Network setup, hardware maintenance, and end-user support across and more!.',
-      accent: '#ffd23f',
+      accent: '#4fd6ff',
       coding: false,
       url: "https://www.linkedin.com/company/reset-soluciones-slu/"
     },
@@ -64,7 +64,7 @@ export const EXPERIENCE = {
       period: '2019 — 2021',
       start: '2019-09',
       end: '2021-06',
-      accent: '#c6ff3d',
+      accent: '#cc0000',
       coding: false,
     },
   ],

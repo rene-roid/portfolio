@@ -118,13 +118,13 @@ export function AboutPage({ item, onBack, onNext, onPrev }: PageProps) {
         <div className="flex flex-col gap-4 justify-center">
           <StyledCard accent="#c6ff3d">
             <div className="font-mono uppercase" style={{ fontSize: 10, letterSpacing: '0.28em', opacity: 0.6 }}>CURRENTLY</div>
-            <div className="font-display italic" style={{ fontSize: 26, marginTop: 6 }}>Full Stack Dev, INFINI</div>
-            <div style={{ opacity: 0.7, marginTop: 4, fontSize: 14 }}>Building custom client-facing web products from scratch.</div>
+            <div className="font-display italic" style={{ fontSize: 26, marginTop: 6 }}>Full Stack Dev · INFINI</div>
+            <div style={{ opacity: 0.7, marginTop: 4, fontSize: 14 }}>Building custom client-facing web tools from scratch.</div>
           </StyledCard>
-          <StyledCard accent="#4fd6ff">
-            <div className="font-mono uppercase" style={{ fontSize: 10, letterSpacing: '0.28em', opacity: 0.6 }}>PREVIOUSLY</div>
-            <div className="font-display italic" style={{ fontSize: 22, marginTop: 6 }}>Tetravol · Campus Net</div>
-            <div style={{ opacity: 0.7, marginTop: 4, fontSize: 14 }}>Game dev internship · IT Support</div>
+          <StyledCard accent="#ff4141">
+            <div className="font-mono uppercase" style={{ fontSize: 10, letterSpacing: '0.28em', opacity: 0.6 }}>PREVIOUS JOB</div>
+            <div className="font-display italic" style={{ fontSize: 22, marginTop: 6 }}>Game Dev Intern · Tetravol</div>
+            <div style={{ opacity: 0.7, marginTop: 4, fontSize: 14 }}>Virtual and augmented reality game development internship</div>
           </StyledCard>
           <StyledCard accent="#ff3b8a">
             <div className="font-mono uppercase" style={{ fontSize: 10, letterSpacing: '0.28em', opacity: 0.6 }}>EDUCATION</div>
@@ -134,7 +134,7 @@ export function AboutPage({ item, onBack, onNext, onPrev }: PageProps) {
           <StyledCard accent="#258a00">
             <div className="font-mono uppercase" style={{ fontSize: 10, letterSpacing: '0.28em', opacity: 0.6 }}>IN PURSUIT OF</div>
             <div className="font-body italic font-black" style={{ fontSize: 18, marginTop: 6, lineHeight: 1.3 }}>
-              A role where I ship polished full-stack products and grow with a team that cares about craft.
+              A role where I produce polished full-stack products and grow with a team that cares about the product that they make.
             </div>
           </StyledCard>
           <div className="grid gap-2" style={{ gridTemplateColumns: 'repeat(3,1fr)', marginTop: 4 }}>
