@@ -71,29 +71,29 @@ function makeNodeObject(node: GraphNode) {
   const canvas = document.createElement('canvas');
   const isCategory = node.type === 'category';
   const isCenter = node.type === 'center';
-  canvas.width = isCategory ? 256 : 220;
-  canvas.height = node.rank ? 52 : 40;
+  canvas.width = isCenter ? 300 : isCategory ? 340 : 280;
+  canvas.height = node.rank ? 72 : 56;
   const ctx = canvas.getContext('2d')!;
   ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-  const fontSize = isCenter ? 22 : isCategory ? 18 : 15;
+  const fontSize = isCenter ? 32 : isCategory ? 26 : 20;
   ctx.font = `bold ${fontSize}px monospace`;
   ctx.fillStyle = node.color;
   ctx.textAlign = 'center';
   ctx.textBaseline = 'middle';
-  ctx.fillText(node.label, canvas.width / 2, node.rank ? canvas.height / 2 - 8 : canvas.height / 2);
+  ctx.fillText(node.label, canvas.width / 2, node.rank ? canvas.height / 2 - 10 : canvas.height / 2);
 
   if (node.rank) {
-    ctx.font = '12px monospace';
+    ctx.font = '16px monospace';
     ctx.fillStyle = `${node.color}bb`;
-    ctx.fillText(node.rank, canvas.width / 2, canvas.height / 2 + 12);
+    ctx.fillText(node.rank, canvas.width / 2, canvas.height / 2 + 16);
   }
 
   const tex = new THREE.CanvasTexture(canvas);
   const sprite = new THREE.Sprite(new THREE.SpriteMaterial({ map: tex, transparent: true, depthWrite: false }));
-  const scale = isCenter ? 30 : isCategory ? 26 : 20;
+  const scale = isCenter ? 44 : isCategory ? 40 : 32;
   sprite.scale.set(scale, scale * (canvas.height / canvas.width), 1);
-  sprite.position.set(0, node.nodeSize * 0.7 + (isCategory ? 7 : 5), 0);
+  sprite.position.set(0, node.nodeSize * 0.7 + (isCategory ? 9 : 6), 0);
   group.add(sprite);
 
   return group;
@@ -103,15 +103,28 @@ export function SkillsPage({ item, onBack, onNext, onPrev }: PageProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const graphRef = useRef<ReturnType<typeof ForceGraph3D> | null>(null);
   const animRef = useRef<number>(0);
+  const autoRotateRef = useRef(true);
   const [selected, setSelected] = useState<GraphNode | null>(null);
 
   const handleNodeClick = useCallback((node: object) => {
     const n = node as GraphNode;
     if (n.type === 'center') return;
-    setSelected(prev => prev?.id === n.id ? null : n);
+
+    let deselecting = false;
+    setSelected(prev => {
+      deselecting = prev?.id === n.id;
+      return deselecting ? null : n;
+    });
+
+    if (deselecting) {
+      autoRotateRef.current = true;
+      return;
+    }
+
+    autoRotateRef.current = false;
 
     if (graphRef.current) {
-      const distance = 120;
+      const distance = 100;
       const nAny = node as any;
       const distRatio = 1 + distance / Math.hypot(nAny.x ?? 1, nAny.y ?? 1, nAny.z ?? 1);
       graphRef.current.cameraPosition(
@@ -159,11 +172,13 @@ export function SkillsPage({ item, onBack, onNext, onPrev }: PageProps) {
     // slow auto-rotate
     let angle = 0;
     const rotate = () => {
-      angle += 0.0015;
-      Graph.cameraPosition({
-        x: 250 * Math.sin(angle),
-        z: 250 * Math.cos(angle),
-      } as any);
+      if (autoRotateRef.current) {
+        angle += 0.0005;
+        Graph.cameraPosition({
+          x: 250 * Math.sin(angle),
+          z: 250 * Math.cos(angle),
+        } as any);
+      }
       animRef.current = requestAnimationFrame(rotate);
     };
     animRef.current = requestAnimationFrame(rotate);
@@ -181,6 +196,15 @@ export function SkillsPage({ item, onBack, onNext, onPrev }: PageProps) {
       graphRef.current = null;
     };
   // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // Prevent wheel events from bubbling up to the page-navigation scroll handler
+  useEffect(() => {
+    const el = containerRef.current;
+    if (!el) return;
+    const stopScroll = (e: WheelEvent) => e.stopPropagation();
+    el.addEventListener('wheel', stopScroll);
+    return () => el.removeEventListener('wheel', stopScroll);
   }, []);
 
   return (
