@@ -110,14 +110,6 @@ export function ContactPage({ item, onBack, onNext, onPrev }: PageProps) {
               zIndex: 999,
             }}
           >
-            {/* scanline sweep */}
-            <div style={{
-              position: 'absolute', left: '-5%', right: '-5%', height: '28%',
-              background: 'linear-gradient(to bottom, transparent, rgba(255,255,255,0.07), transparent)',
-              pointerEvents: 'none', zIndex: 10,
-              animation: go ? 'scanline 3.8s ease-in-out 1.4s infinite' : 'none',
-              top: '-20%',
-            }} />
 
             <span style={{
               display: 'block', color: '#fff',
