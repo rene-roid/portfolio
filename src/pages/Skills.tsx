@@ -382,27 +382,26 @@ export function SkillsPage({ item, onBack, onNext, onPrev }: PageProps) {
             </aside>
           </div>
 
-          {selected && (
-            <div
-              className="font-mono"
-              style={{
-                pointerEvents: 'none',
-                alignSelf: 'center',
-                background: 'rgba(5,12,32,0.85)',
-                border: `1px solid ${selected.color}`,
-                padding: '8px 20px',
-                letterSpacing: '0.12em',
-                backdropFilter: 'blur(8px)',
-              }}
-            >
-              <span style={{ color: selected.color, fontSize: 13 }}>{selected.label}</span>
-              {selected.rank && (
-                <span style={{ marginLeft: 14, fontSize: 11, opacity: 0.7 }}>
-                  RANK · <span style={{ color: selected.color }}>{selected.rank}</span>
-                </span>
-              )}
-            </div>
-          )}
+          <div
+            className="font-mono"
+            style={{
+              pointerEvents: 'none',
+              alignSelf: 'center',
+              background: selected ? 'rgba(5,12,32,0.85)' : 'transparent',
+              border: `1px solid ${selected ? selected.color : 'transparent'}`,
+              padding: '8px 20px',
+              letterSpacing: '0.12em',
+              backdropFilter: selected ? 'blur(8px)' : 'none',
+              visibility: selected ? 'visible' : 'hidden',
+            }}
+          >
+            <span style={{ color: selected?.color, fontSize: 13 }}>{selected?.label ?? '\u00A0'}</span>
+            {selected?.rank && (
+              <span style={{ marginLeft: 14, fontSize: 11, opacity: 0.7 }}>
+                RANK · <span style={{ color: selected.color }}>{selected.rank}</span>
+              </span>
+            )}
+          </div>
 
           <div className="font-mono uppercase" style={{ fontSize: 10, letterSpacing: '0.18em', opacity: 0.45, pointerEvents: 'none' }}>
             drag · rotate · scroll page to navigate · click node to inspect
