@@ -35,7 +35,8 @@ export interface Project {
   summary: string;
   stack: string[];
   links: ProjectLink[];
-  body: ProjectBodyBlock[];
+  body?: ProjectBodyBlock[];
+  mdFile?: string;
 }
 
 export const PROJECT_CATEGORIES: ProjectCategory[] = [
@@ -59,12 +60,7 @@ export const PROJECTS: Project[] = [
     summary: 'A rhythm runner game built in Unity & C# for a school game jam. Avoid obstacles in sync with the beat.',
     stack: ['Unity', 'C#', 'FMOD'],
     links: [{ l: 'Repository', u: 'https://github.com/...' }],
-    body: [
-      { kind: 'h', text: 'The brief' },
-      { kind: 'p', text: 'A rhythm runner game created using Unity and C# for a game jam held at my school in 2022. The game challenges the player to avoid obstacles by dodging left, right, or jumping — all in sync with the beat.' },
-      { kind: 'img', label: 'Gameplay · DIO fight', accent: '#ff3b8a' },
-      { kind: 'p', text: 'The project pushed me to learn real-time audio synchronisation, procedural obstacle generation, and rapid prototyping under a 48-hour deadline.' },
-    ],
+    mdFile: 'rhythm-game.md',
   },
   {
     id: 'project-02',

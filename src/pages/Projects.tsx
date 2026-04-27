@@ -5,6 +5,9 @@ import type {PageProps} from '../types';
 import {PROJECTS, PROJECT_CATEGORIES} from '../data';
 import type {Project, ProjectCategory} from '../data';
 import {PageShell} from '../components/PageShell';
+import {MarkdownRenderer} from '../components/MarkdownRenderer';
+
+const mdModules = import.meta.glob('../content/projects/*.md', { query: '?raw', import: 'default' });
 
 function FadeIn({children, style}: {children: ReactNode; style?: CSSProperties}) {
   const [on, setOn] = useState(false);
@@ -273,10 +276,21 @@ function ProjectCard({project, index, onOpen}: {project: Project; index: number;
 }
 
 function ProjectDetail({project, onClose}: {project: Project; onClose: () => void}) {
+  const [mdData, setMdData] = useState<{file: string; content: string} | null>(null);
+
+  useEffect(() => {
+    if (!project.mdFile) return;
+    const key = `../content/projects/${project.mdFile}`;
+    const loader = mdModules[key];
+    if (loader) loader().then(c => setMdData({file: project.mdFile!, content: c as string}));
+  }, [project.mdFile]);
+
+  const mdContent = mdData ? mdData?.file === project.mdFile ? mdData.content : null : null;
+
   return (
     <div style={{display: 'grid', gridTemplateColumns: '1fr 280px', gap: 30, height: '100%', overflow: 'hidden'}}>
       {/* LEFT — body */}
-      <CustomScroll accent={project.accent} style={{minHeight: 0}} innerStyle={{paddingRight: 16}}>
+      <CustomScroll accent={project.accent} style={{minHeight: 0}} innerStyle={{paddingRight: 16, paddingLeft: 4}}>
         <button
           onClick={onClose}
           onMouseEnter={e => {
@@ -340,53 +354,63 @@ function ProjectDetail({project, onClose}: {project: Project; onClose: () => voi
           }}>{project.name}</div>
         </div>
 
-        {/* body blocks */}
-        <div style={{marginTop: 22, maxWidth: 680, paddingBottom: 40}}>
-          {project.body.map((b, i) => {
-            if (b.kind === 'h') return (
-              <h2 key={i} style={{
-                marginTop: i === 0 ? 0 : 30,
-                fontFamily: "'Archivo Black', sans-serif", fontStyle: 'italic',
-                fontSize: 28, letterSpacing: '-0.03em', color: '#fff',
-                transform: 'skewX(-6deg)',
-                borderLeft: `3px solid ${project.accent}`, paddingLeft: 12,
-              }}>{b.text}</h2>
-            );
-            if (b.kind === 'p') return (
-              <p key={i} style={{
-                marginTop: 12, fontSize: 15.5, lineHeight: 1.62,
-                color: '#d9e6ff',
-              }}>{b.text}</p>
-            );
-            if (b.kind === 'img') {
-              const imgAccent = b.accent ?? project.accent;
-              return (
-                <div key={i} style={{
-                  marginTop: 18, height: 180,
-                  background: `linear-gradient(135deg, ${imgAccent}22, #0a1b3d)`,
-                  border: `1px solid ${imgAccent}55`,
-                  position: 'relative', overflow: 'hidden',
-                }}>
-                  <svg style={{position: 'absolute', inset: 0, width: '100%', height: '100%', opacity: 0.2}}>
-                    <defs>
-                      <pattern id={`bi-${i}-${project.id}`} width="16" height="16" patternUnits="userSpaceOnUse" patternTransform={`rotate(${20 + i * 20})`}>
-                        <circle cx="3" cy="3" r="1.5" fill={imgAccent} />
-                      </pattern>
-                    </defs>
-                    <rect width="100%" height="100%" fill={`url(#bi-${i}-${project.id})`} />
-                  </svg>
-                  <div style={{
-                    position: 'absolute', left: 14, top: 12,
-                    fontFamily: 'JetBrains Mono, monospace', fontSize: 10,
-                    letterSpacing: '0.24em', textTransform: 'uppercase',
-                    color: imgAccent, opacity: 0.85,
-                  }}>[ IMG · {b.label} ]</div>
-                </div>
+        {/* body */}
+        {project.mdFile ? (
+          mdContent === null ? (
+            <div style={{
+              marginTop: 22, fontFamily: 'JetBrains Mono, monospace',
+              fontSize: 11, letterSpacing: '0.22em', color: project.accent, opacity: 0.65,
+            }}>loading…</div>
+          ) : (
+            <MarkdownRenderer content={mdContent} accent={project.accent} />
+          )
+        ) : (
+          <div style={{marginTop: 22, maxWidth: 680, paddingBottom: 40}}>
+            {(project.body ?? []).map((b, i) => {
+              if (b.kind === 'h') return (
+                <h2 key={i} style={{
+                  marginTop: i === 0 ? 0 : 30,
+                  fontFamily: "'Archivo Black', sans-serif", fontStyle: 'italic',
+                  fontSize: 28, letterSpacing: '-0.03em', color: '#fff',
+                  transform: 'skewX(-6deg)',
+                  borderLeft: `3px solid ${project.accent}`, paddingLeft: 12,
+                }}>{b.text}</h2>
               );
-            }
-            return null;
-          })}
-        </div>
+              if (b.kind === 'p') return (
+                <p key={i} style={{
+                  marginTop: 12, fontSize: 15.5, lineHeight: 1.62, color: '#d9e6ff',
+                }}>{b.text}</p>
+              );
+              if (b.kind === 'img') {
+                const imgAccent = b.accent ?? project.accent;
+                return (
+                  <div key={i} style={{
+                    marginTop: 18, height: 180,
+                    background: `linear-gradient(135deg, ${imgAccent}22, #0a1b3d)`,
+                    border: `1px solid ${imgAccent}55`,
+                    position: 'relative', overflow: 'hidden',
+                  }}>
+                    <svg style={{position: 'absolute', inset: 0, width: '100%', height: '100%', opacity: 0.2}}>
+                      <defs>
+                        <pattern id={`bi-${i}-${project.id}`} width="16" height="16" patternUnits="userSpaceOnUse" patternTransform={`rotate(${20 + i * 20})`}>
+                          <circle cx="3" cy="3" r="1.5" fill={imgAccent} />
+                        </pattern>
+                      </defs>
+                      <rect width="100%" height="100%" fill={`url(#bi-${i}-${project.id})`} />
+                    </svg>
+                    <div style={{
+                      position: 'absolute', left: 14, top: 12,
+                      fontFamily: 'JetBrains Mono, monospace', fontSize: 10,
+                      letterSpacing: '0.24em', textTransform: 'uppercase',
+                      color: imgAccent, opacity: 0.85,
+                    }}>[ IMG · {b.label} ]</div>
+                  </div>
+                );
+              }
+              return null;
+            })}
+          </div>
+        )}
       </CustomScroll>
 
       {/* RIGHT — meta sidebar */}
