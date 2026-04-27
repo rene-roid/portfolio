@@ -59,15 +59,32 @@ export function ProjectsPage({item, onBack, onNext, onPrev}: PageProps) {
         </FadeIn>
       ) : (
         <FadeIn key="grid" style={{overflow: 'hidden'}}>
-          <div style={{display: 'grid', gridTemplateColumns: '220px 1fr', gap: 30, height: '100%', overflow: 'hidden'}}>
-            <ProjectSidebar
-              cats={PROJECT_CATEGORIES}
-              current={cat}
-              onPick={setCat}
-              count={filtered.length}
-              accent={item.color}
-            />
-            <ProjectGrid items={filtered} onOpen={(id) => navigate(`/projects/${id}`)} />
+          <div style={{display: 'flex', flexDirection: 'column', gap: 14, height: '100%', overflow: 'hidden'}}>
+            <div>
+              <div style={{
+                fontFamily: 'JetBrains Mono, monospace', fontSize: 11,
+                letterSpacing: '0.28em', textTransform: 'uppercase', opacity: 0.7,
+                marginBottom: 4,
+              }}>projects.load()</div>
+              <div style={{
+                fontFamily: "'Archivo Black', sans-serif", fontStyle: 'italic',
+                fontSize: 'clamp(36px, 4vw, 58px)', lineHeight: 0.9,
+                letterSpacing: '-0.03em', transform: 'skewX(-6deg)',
+                color: '#fff', textShadow: `4px 4px 0 ${item.color}`,
+              }}>
+                MY <span style={{color: item.color, textShadow: '4px 4px 0 #fff'}}>PROJECTS</span>
+              </div>
+            </div>
+            <div style={{display: 'grid', gridTemplateColumns: '220px 1fr', gap: 30, flex: 1, minHeight: 0, overflow: 'hidden'}}>
+              <ProjectSidebar
+                cats={PROJECT_CATEGORIES}
+                current={cat}
+                onPick={setCat}
+                count={filtered.length}
+                accent={item.color}
+              />
+              <ProjectGrid items={filtered} onOpen={(id) => navigate(`/projects/${id}`)} />
+            </div>
           </div>
         </FadeIn>
       )}
