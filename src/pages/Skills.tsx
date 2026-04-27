@@ -1,5 +1,7 @@
 import { useRef, useEffect, useState, useCallback } from 'react';
 import ForceGraph3D from '3d-force-graph';
+import type { ForceGraph3DInstance, ConfigOptions } from '3d-force-graph';
+import type { NodeObject, LinkObject, GraphData } from 'three-forcegraph';
 import * as THREE from 'three';
 import type { PageProps } from '../types';
 import { SKILL_GROUPS } from '../data';
@@ -22,6 +24,7 @@ interface GraphLink {
   target: string;
   linkColor: string;
 }
+type FG3DFactory = (config?: ConfigOptions) => (el: HTMLElement) => ForceGraph3DInstance;
 
 function buildGraph() {
   const nodes: GraphNode[] = [];
@@ -101,13 +104,13 @@ function makeNodeObject(node: GraphNode) {
 
 export function SkillsPage({ item, onBack, onNext, onPrev }: PageProps) {
   const containerRef = useRef<HTMLDivElement>(null);
-  const graphRef = useRef<ReturnType<typeof ForceGraph3D> | null>(null);
+  const graphRef = useRef<ForceGraph3DInstance | null>(null);
   const animRef = useRef<number>(0);
   const autoRotateRef = useRef(true);
   const [selected, setSelected] = useState<GraphNode | null>(null);
 
   const handleNodeClick = useCallback((node: object) => {
-    const n = node as GraphNode;
+    const n = node as GraphNode & NodeObject;
     if (n.type === 'center') return;
 
     let deselecting = false;
@@ -125,11 +128,10 @@ export function SkillsPage({ item, onBack, onNext, onPrev }: PageProps) {
 
     if (graphRef.current) {
       const distance = 100;
-      const nAny = node as any;
-      const distRatio = 1 + distance / Math.hypot(nAny.x ?? 1, nAny.y ?? 1, nAny.z ?? 1);
+      const distRatio = 1 + distance / Math.hypot(n.x ?? 1, n.y ?? 1, n.z ?? 1);
       graphRef.current.cameraPosition(
-        { x: (nAny.x ?? 0) * distRatio, y: (nAny.y ?? 0) * distRatio, z: (nAny.z ?? 0) * distRatio },
-        nAny as any,
+        { x: (n.x ?? 0) * distRatio, y: (n.y ?? 0) * distRatio, z: (n.z ?? 0) * distRatio },
+        { x: n.x ?? 0, y: n.y ?? 0, z: n.z ?? 0 },
         800
       );
     }
@@ -142,11 +144,11 @@ export function SkillsPage({ item, onBack, onNext, onPrev }: PageProps) {
     const h = el.offsetHeight;
     if (w === 0 || h === 0) return;
 
-    const Graph = ForceGraph3D({ antialias: true, alpha: true })(el)
+    const Graph = (ForceGraph3D as unknown as FG3DFactory)({ rendererConfig: { antialias: true, alpha: true } })(el)
       .width(w)
       .height(h)
       .backgroundColor('rgba(0,0,0,0)')
-      .graphData(GRAPH_DATA as any)
+      .graphData(GRAPH_DATA as GraphData<NodeObject, LinkObject>)
       .nodeThreeObject((node: object) => makeNodeObject(node as GraphNode))
       .nodeThreeObjectExtend(false)
       .linkColor((link: object) => (link as GraphLink).linkColor)
@@ -177,7 +179,7 @@ export function SkillsPage({ item, onBack, onNext, onPrev }: PageProps) {
         Graph.cameraPosition({
           x: 250 * Math.sin(angle),
           z: 250 * Math.cos(angle),
-        } as any);
+        });
       }
       animRef.current = requestAnimationFrame(rotate);
     };
