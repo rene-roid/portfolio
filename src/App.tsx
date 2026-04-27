@@ -11,6 +11,60 @@ import { SkillsPage } from './pages/Skills';
 import { ProjectsPage } from './pages/Projects';
 import { ContactPage } from './pages/Contact';
 
+function ScrollHint({ canScroll, color, hidden }: {
+  canScroll: boolean;
+  color: string;
+  hidden: boolean;
+}) {
+  const show = canScroll && !hidden;
+  return (
+    <div style={{
+      position: 'fixed',
+      bottom: 28,
+      left: '50%',
+      transform: 'translateX(-50%)',
+      zIndex: 5,
+      opacity: show ? 1 : 0,
+      transition: 'opacity 350ms ease',
+      pointerEvents: 'none',
+      display: 'flex',
+      flexDirection: 'column',
+      alignItems: 'center',
+      gap: 6,
+    }}>
+      <div style={{
+        width: 18,
+        height: 28,
+        border: `1.5px solid ${color}66`,
+        borderRadius: 9,
+        position: 'relative',
+      }}>
+        <div style={{
+          position: 'absolute',
+          top: 5,
+          right: '43%',
+          transform: 'translateX(-50%)',
+          width: 3,
+          height: 7,
+          background: color,
+          borderRadius: 2,
+          animation: 'scroll-dot 7s ease-in-out infinite',
+        }} />
+      </div>
+      <div style={{
+        fontFamily: 'monospace',
+        fontSize: 8,
+        letterSpacing: '0.22em',
+        color,
+        opacity: 0.5,
+        textTransform: 'uppercase',
+      }}>
+        SCROLL
+      </div>
+    </div>
+  );
+}
+
 function ScrollChargeBar({ charge, visible, color, dir, discharging }: {
   charge: number;
   visible: boolean;
@@ -238,6 +292,12 @@ export default function App() {
           onDone={trans.phase === 'cover' ? onCoverDone : onRevealDone}
         />
       )}
+
+      <ScrollHint
+        canScroll={navIndex > 0 || navIndex < NAV_ORDER.length - 1}
+        color={(currentItem?.color) ?? '#4fd6ff'}
+        hidden={barVisible}
+      />
 
       <ScrollChargeBar
         charge={barCharge}
