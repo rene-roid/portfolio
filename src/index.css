@@ -1,5 +1,14 @@
 @import "tailwindcss";
 
+.no-scrollbar::-webkit-scrollbar { display: none; }
+
+@keyframes btnJump {
+  0%   { transform: skewX(-10deg) translateX(0); }
+  40%  { transform: skewX(-10deg) translateX(-12px); }
+  /* 70%  { transform: skewX(-10deg) translateX(4px); } */
+  100% { transform: skewX(-10deg) translateX(0); }
+}
+
 @keyframes char-shine {
   0%   { filter: brightness(1) drop-shadow(0 0 0px rgba(255,255,255,0)); }
   50%  { filter: brightness(3.5) drop-shadow(0 0 18px rgba(255,255,255,1)); }

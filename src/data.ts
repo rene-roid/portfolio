@@ -8,88 +8,110 @@ export const MENU_ITEMS: MenuItem[] = [
   { id: 'contact', label: 'CONTACT', sub: 'Send a Signal',   color: '#ff7a3a', hue: 'crimson', transition: 'slash',  command: 'CONTACT' },
 ];
 
-export type ProjectBlock =
-  | { type: 'paragraph'; text: string }
-  | { type: 'image'; src: string; caption?: string };
+export type ProjectBodyBlock =
+  | { kind: 'h'; text: string }
+  | { kind: 'p'; text: string }
+  | { kind: 'img'; label: string; accent?: string };
+
+export interface ProjectLink {
+  l: string;
+  u: string;
+}
+
+export interface ProjectCategory {
+  id: string;
+  label: string;
+  color: string;
+}
 
 export interface Project {
+  id: string;
   name: string;
-  role: string;
-  year: string;
-  tag: string;
+  cat: string;
   accent: string;
-  desc: string;
-  /** Rich content displayed in the hero/detail area */
-  content?: ProjectBlock[];
-  links?: { label: string; url: string }[];
+  year: string;
+  role: string;
+  tag: string;
+  summary: string;
+  stack: string[];
+  links: ProjectLink[];
+  body: ProjectBodyBlock[];
 }
+
+export const PROJECT_CATEGORIES: ProjectCategory[] = [
+  { id: 'all',  label: 'ALL',         color: '#ffffff' },
+  { id: 'apps', label: 'WEB APPS',    color: '#4fd6ff' },
+  { id: 'game', label: 'GAMES',       color: '#ff3b8a' },
+  { id: 'tool', label: 'TOOLS',       color: '#ffd23f' },
+  { id: 'exp',  label: 'EXPERIMENTS', color: '#a56bff' },
+  { id: 'oss',  label: 'OPEN SOURCE', color: '#c6ff3d' },
+];
 
 export const PROJECTS: Project[] = [
   {
-    name: 'Rythm Game',
-    role: 'Personal',
-    year: '2023',
-    tag: 'Game development',
-    accent: '#4fd6ff',
-    desc: 'A rhythm runner game built in Unity & C# for a school game jam.',
-    content: [
-      {
-        type: 'paragraph',
-        text: 'This is a rhythm runner game created using Unity and C# for a game jam held at my school in 2022. The game challenges the player to avoid obstacles by dodging left, right, or jumping — all in sync with the beat.'
-      },
-      {type: 'image', src: '/public/projects/dio_fight.gif'},
-      {
-        type: 'paragraph',
-        text: 'The project pushed me to learn real-time audio synchronisation, procedural obstacle generation, and rapid prototyping under a 48-hour deadline.'
-      },
-    ],
-    links: [
-      {label: 'Repository', url: 'https://github.com/...'},
-    ],
-  },
-  {
-    name: '1234567890123',
-    role: 'Frontend',
-    year: '0999',
-    tag: 'Web application',
+    id: 'rhythm-game',
+    name: 'RHYTHM GAME',
+    cat: 'game',
     accent: '#ff3b8a',
-    desc: 'TODO — add project description, tech stack, and link.',
-    content: [
-      {
-        type: 'paragraph',
-        text: ' Lorem ipsum dolor sit amet, consectetur adipiscing elit. In dignissim euismod finibus. Sed laoreet commodo ex a volutpat. Sed quis volutpat tortor. Aliquam aliquam tincidunt diam, congue facilisis nisl imperdiet eget. Nullam porta dui vitae purus faucibus, in egestas enim euismod. Cras ultricies turpis id nisl placerat iaculis. Vestibulum ut scelerisque ante, id feugiat odio. Pellentesque est velit, interdum in tristique sit amet, fringilla a justo. Orci varius natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Mauris mollis justo metus, gravida congue lectus blandit eget. Phasellus eget felis mattis, convallis erat eget, tristique arcu. Quisque eu mi dapibus neque pharetra hendrerit nec at erat. Nunc pretium turpis id ligula placerat mollis. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia curae; Interdum et malesuada fames ac ante ipsum primis in faucibus.\n' +
-          '\n' +
-          'Phasellus id nibh nisl. Vestibulum auctor mollis eros eget placerat. Vivamus congue velit sed sem eleifend interdum. Aliquam feugiat erat at quam vulputate vehicula. Sed laoreet in tortor nec luctus. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aliquam placerat iaculis libero, nec maximus ipsum.\n' +
-          '\n' +
-          'Vivamus nec libero sed arcu mollis vestibulum eget sed dolor. Nulla ut velit sed sapien aliquet gravida ac eget ipsum. Fusce aliquet elit sem, in efficitur diam euismod in. Maecenas eu mauris et tellus varius tincidunt sed nec risus. Duis nisi augue, ultricies ac tincidunt id, mollis a eros. Quisque id porta felis. Proin eget feugiat orci, quis euismod risus. Mauris at sollicitudin urna. Donec elementum eu ligula vitae finibus. Morbi vestibulum, massa ut viverra porta, metus urna facilisis magna, eget sagittis leo nunc id enim. In placerat magna odio, nec pretium ligula finibus vitae. Duis ultrices orci eros, et auctor odio bibendum a. Morbi vestibulum lobortis tempor.\n' +
-          '\n' +
-          'Duis maximus vulputate euismod. Sed nec dui tristique, vehicula arcu et, consectetur enim. Curabitur id sapien sagittis, iaculis mauris eu, gravida metus. Nulla tristique sem nec pulvinar fringilla. Nullam quis enim lobortis, blandit dui ut, posuere sem. Mauris quis finibus urna, a pharetra massa. Morbi pulvinar metus at ante posuere scelerisque. Morbi ultrices ex sed lobortis malesuada. Proin malesuada sem urna, eu rhoncus elit maximus at. Pellentesque rutrum lorem mollis justo eleifend, eu feugiat diam tempus. Donec sed est justo.\n' +
-          '\n' +
-          'Donec quis neque augue. Curabitur dapibus eleifend lorem vitae volutpat. Aliquam maximus nibh et urna dapibus aliquet. Orci varius natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Praesent ultricies, nulla id euismod rhoncus, metus arcu pulvinar leo, vel porttitor ligula nibh et sem. Quisque congue nulla tempor, convallis ante non, viverra tellus. Sed dui magna, luctus non neque non, lacinia semper justo. Proin id massa eget arcu pretium ultricies vitae eget justo. Suspendisse fringilla, elit in hendrerit ultricies, risus augue auctor ipsum, aliquam scelerisque ante nunc quis est. Praesent id justo nibh. Nullam sed purus dolor. Phasellus feugiat est sed fringilla aliquam. Nullam et tempor orci, a efficitur nibh. Praesent molestie pulvinar sem luctus cursus. Sed eget diam sed massa vestibulum convallis. '
-      },
-      // { type: 'image', src: '/images/project2-hero.png', caption: 'Hero image' },
-    ],
-  },
-  {
-    name: 'PROJECT 03',
-    role: 'Frontend',
-    year: '0999',
-    tag: 'Web application',
-    accent: '#ffd23f',
-    desc: 'TODO — add project description, tech stack, and link.',
-    content: [
-      {type: 'paragraph', text: 'TODO — add project description.'},
-    ],
-  },
-  {
-    name: 'SIDE PROJECT',
+    year: '2023',
     role: 'Personal',
-    year: '0999',
-    tag: 'Side project',
-    accent: '#c6ff3d',
-    desc: 'TODO — add project description, tech stack, and link.',
-    content: [
-      {type: 'paragraph', text: 'TODO — add project description.'},
+    tag: 'Game development',
+    summary: 'A rhythm runner game built in Unity & C# for a school game jam. Avoid obstacles in sync with the beat.',
+    stack: ['Unity', 'C#', 'FMOD'],
+    links: [{ l: 'Repository', u: 'https://github.com/...' }],
+    body: [
+      { kind: 'h', text: 'The brief' },
+      { kind: 'p', text: 'A rhythm runner game created using Unity and C# for a game jam held at my school in 2022. The game challenges the player to avoid obstacles by dodging left, right, or jumping — all in sync with the beat.' },
+      { kind: 'img', label: 'Gameplay · DIO fight', accent: '#ff3b8a' },
+      { kind: 'p', text: 'The project pushed me to learn real-time audio synchronisation, procedural obstacle generation, and rapid prototyping under a 48-hour deadline.' },
+    ],
+  },
+  {
+    id: 'project-02',
+    name: 'PROJECT 02',
+    cat: 'apps',
+    accent: '#4fd6ff',
+    year: '2024',
+    role: 'Frontend',
+    tag: 'Web application',
+    summary: 'TODO — add project description, tech stack, and link.',
+    stack: ['React', 'TypeScript'],
+    links: [],
+    body: [
+      { kind: 'h', text: 'Overview' },
+      { kind: 'p', text: 'TODO — add project description.' },
+    ],
+  },
+  {
+    id: 'project-03',
+    name: 'PROJECT 03',
+    cat: 'tool',
+    accent: '#ffd23f',
+    year: '2024',
+    role: 'Solo',
+    tag: 'Developer tool',
+    summary: 'TODO — add project description, tech stack, and link.',
+    stack: ['Node.js', 'TypeScript'],
+    links: [],
+    body: [
+      { kind: 'h', text: 'Overview' },
+      { kind: 'p', text: 'TODO — add project description.' },
+    ],
+  },
+  {
+    id: 'side-project',
+    name: 'SIDE PROJECT',
+    cat: 'exp',
+    accent: '#a56bff',
+    year: '2025',
+    role: 'Personal',
+    tag: 'Experiment',
+    summary: 'TODO — add project description, tech stack, and link.',
+    stack: ['WebGL', 'GLSL'],
+    links: [],
+    body: [
+      { kind: 'h', text: 'Overview' },
+      { kind: 'p', text: 'TODO — add project description.' },
     ],
   },
 ];

@@ -152,13 +152,15 @@ export default function App() {
   const fadeTimer = useRef<ReturnType<typeof setTimeout>>(undefined);
   const navIndexRef = useRef(0);
   const pendingRef = useRef<string | null>(null);
+  const isProjectDetailRef = useRef(false);
 
   const CHARGE_THRESHOLD = 620;
 
   useEffect(() => { audioPlayer.init(); }, []);
 
   const pathname = location.pathname;
-  const routeId = pathname === '/' ? 'menu' : pathname.slice(1);
+  const isProjectDetail = /^\/projects\/[^/]+$/.test(pathname);
+  const routeId = pathname === '/' ? 'menu' : pathname.split('/')[1];
   const isMenu = pathname === '/';
   const currentItem = MENU_ITEMS.find(m => m.id === routeId) ?? null;
   const PageComp = !isMenu ? PAGES[routeId] : null;
@@ -178,6 +180,7 @@ export default function App() {
 
   useEffect(() => { navIndexRef.current = navIndex; }, [navIndex]);
   useEffect(() => { pendingRef.current = pending; }, [pending]);
+  useEffect(() => { isProjectDetailRef.current = isProjectDetail; }, [isProjectDetail]);
 
   const goNext = useCallback(() => {
     if (navIndex < NAV_ORDER.length - 1) {
@@ -196,6 +199,7 @@ export default function App() {
   // Wheel → charge bar → navigate
   useEffect(() => {
     function discharge() {
+      chargeAccum.current = 0;
       setBarDischarging(true);
       setBarCharge(0);
       clearTimeout(fadeTimer.current);
@@ -204,6 +208,7 @@ export default function App() {
 
     function onWheel(e: WheelEvent) {
       if (pendingRef.current) return;
+      if (isProjectDetailRef.current) return;
       if (Math.abs(e.deltaY) < 5) return;
 
       const dir: 'next' | 'prev' = e.deltaY > 0 ? 'next' : 'prev';
@@ -294,7 +299,7 @@ export default function App() {
       )}
 
       <ScrollHint
-        canScroll={navIndex > 0 || navIndex < NAV_ORDER.length - 1}
+        canScroll={!isProjectDetail && (navIndex > 0 || navIndex < NAV_ORDER.length - 1)}
         color={(currentItem?.color) ?? '#4fd6ff'}
         hidden={barVisible}
       />
