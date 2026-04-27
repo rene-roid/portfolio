@@ -328,7 +328,7 @@ function ProjectDetail({project, onClose}: {project: Project; onClose: () => voi
         }}>{project.tag}</div>
 
         {/* hero placeholder */}
-        <div style={{
+        {/* <div style={{
           marginTop: 22, height: 200,
           background: `linear-gradient(135deg, ${project.accent}33, #0a1b3d)`,
           border: `1px solid ${project.accent}`, position: 'relative', overflow: 'hidden',
@@ -352,7 +352,7 @@ function ProjectDetail({project, onClose}: {project: Project; onClose: () => voi
             fontSize: 42, color: '#fff', letterSpacing: '-0.02em',
             textShadow: `4px 4px 0 ${project.accent}`,
           }}>{project.name}</div>
-        </div>
+        </div> */}
 
         {/* body */}
         {project.mdFile ? (
