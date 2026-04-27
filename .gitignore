@@ -138,3 +138,5 @@ dist
 # Claude
 .claude/
 /.idea/
+
+.idea/
