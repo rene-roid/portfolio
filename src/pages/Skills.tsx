@@ -562,7 +562,7 @@ export function SkillsPage({ item, onBack, onNext, onPrev }: PageProps) {
           </div>
 
           <div className="font-mono uppercase" style={{ fontSize: 10, letterSpacing: '0.18em', opacity: 0.45, pointerEvents: 'none' }}>
-            drag · rotate · scroll page to navigate · click node to inspect
+            drag · click node to inspect
           </div>
         </div>
       </div>
