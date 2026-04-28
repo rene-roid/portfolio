@@ -26,14 +26,6 @@ interface GraphLink {
   linkColor: string;
 }
 
-interface SkillMenuEntry {
-  id: string;
-  label: string;
-  color: string;
-  depth: number;
-  rank?: string;
-}
-
 type FG3DFactory = (config?: ConfigOptions) => (el: HTMLElement) => ForceGraph3DInstance;
 const GRAPH_BLEED = 120;
 
@@ -121,33 +113,6 @@ function getFocusDistance(node: GraphNode) {
   return Math.max(56, 140 - node.depth * 36);
 }
 
-function buildSkillMenuEntries() {
-  const entries: SkillMenuEntry[] = [];
-
-  for (const group of SKILL_GROUPS) {
-    entries.push({
-      id: `cat_${group.name}`,
-      label: group.name,
-      color: group.color,
-      depth: 1,
-    });
-
-    for (const [name, rank] of group.items) {
-      entries.push({
-        id: `skill_${group.name}_${name}`,
-        label: name,
-        color: group.color,
-        depth: 2,
-        rank,
-      });
-    }
-  }
-
-  return entries;
-}
-
-const SKILL_MENU_ENTRIES = buildSkillMenuEntries();
-
 export function SkillsPage({ item, onBack, onNext, onPrev }: PageProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const menuRef = useRef<HTMLElement>(null);
@@ -159,13 +124,16 @@ export function SkillsPage({ item, onBack, onNext, onPrev }: PageProps) {
   const orbitDistanceRef = useRef(250);
   const desiredOrbitDistanceRef = useRef(250);
   const [selected, setSelected] = useState<GraphNode | null>(null);
+  // selectedRef kept in sync synchronously so rAF loop always reads latest value
+  const selectedRef = useRef<GraphNode | null>(null);
+  const tooltipRef = useRef<HTMLDivElement>(null);
 
   const focusNode = useCallback((node: GraphNode & NodeObject) => {
     if (node.type === 'center') {
       setSelected(null);
+      selectedRef.current = null;
       desiredOrbitTargetRef.current = { x: 0, y: 0, z: 0 };
       desiredOrbitDistanceRef.current = 250;
-
       if (graphRef.current) {
         graphRef.current.cameraPosition(
           { x: 0, y: 0, z: 250 },
@@ -173,27 +141,28 @@ export function SkillsPage({ item, onBack, onNext, onPrev }: PageProps) {
           800
         );
       }
-
       return;
     }
 
-    let deselecting = false;
-    setSelected(prev => {
-      deselecting = prev?.id === node.id;
-      return deselecting ? null : node;
-    });
+    const deselecting = selectedRef.current?.id === node.id;
 
     if (deselecting) {
+      setSelected(null);
+      selectedRef.current = null;
       desiredOrbitTargetRef.current = { x: 0, y: 0, z: 0 };
       desiredOrbitDistanceRef.current = 250;
       return;
     }
 
+    const graphNode = node as unknown as GraphNode;
+    setSelected(graphNode);
+    selectedRef.current = graphNode;
+
     desiredOrbitTargetRef.current = { x: node.x ?? 0, y: node.y ?? 0, z: node.z ?? 0 };
-    desiredOrbitDistanceRef.current = getOrbitDistance(node);
+    desiredOrbitDistanceRef.current = getOrbitDistance(graphNode);
 
     if (graphRef.current) {
-      const distance = getFocusDistance(node);
+      const distance = getFocusDistance(graphNode);
       const distRatio = 1 + distance / Math.hypot(node.x ?? 1, node.y ?? 1, node.z ?? 1);
       graphRef.current.cameraPosition(
         { x: (node.x ?? 0) * distRatio, y: (node.y ?? 0) * distRatio, z: (node.z ?? 0) * distRatio },
@@ -239,7 +208,6 @@ export function SkillsPage({ item, onBack, onNext, onPrev }: PageProps) {
       .d3AlphaDecay(0.02)
       .d3VelocityDecay(0.3);
 
-    // ambient + point lights
     const scene = Graph.scene();
     scene.add(new THREE.AmbientLight(0xffffff, 0.6));
     const pt = new THREE.PointLight(0xffffff, 1.2, 500);
@@ -252,7 +220,6 @@ export function SkillsPage({ item, onBack, onNext, onPrev }: PageProps) {
 
     graphRef.current = Graph;
 
-    // slow auto-rotate
     let angle = 0;
     const rotate = () => {
       if (autoRotateRef.current) {
@@ -270,6 +237,30 @@ export function SkillsPage({ item, onBack, onNext, onPrev }: PageProps) {
           z: target.z + distance * Math.cos(angle),
         }, target);
       }
+
+      // Project selected node to 2D screen coords and move tooltip DOM node directly (no React re-render)
+      const node = selectedRef.current;
+      const tip = tooltipRef.current;
+      const container = containerRef.current;
+      if (node?.x !== undefined && node.y !== undefined && node.z !== undefined && tip && container && graphRef.current) {
+        const camera = (graphRef.current as unknown as { camera: () => THREE.PerspectiveCamera }).camera();
+        const vec = new THREE.Vector3(node.x, node.y, node.z);
+        vec.project(camera);
+
+        if (vec.z < 1) {
+          // NDC → container px → outer-div px (subtract bleed offset)
+          const px = (vec.x + 1) / 2 * container.offsetWidth - GRAPH_BLEED;
+          const py = (-vec.y + 1) / 2 * container.offsetHeight - GRAPH_BLEED;
+          tip.style.left = `${px}px`;
+          tip.style.top = `${py}px`;
+          tip.style.opacity = '1';
+        } else {
+          tip.style.opacity = '0';
+        }
+      } else if (tip) {
+        tip.style.opacity = '0';
+      }
+
       animRef.current = requestAnimationFrame(rotate);
     };
     animRef.current = requestAnimationFrame(rotate);
@@ -297,19 +288,123 @@ export function SkillsPage({ item, onBack, onNext, onPrev }: PageProps) {
     return () => el.removeEventListener('wheel', stopScroll);
   }, []);
 
+  // Derive tooltip metadata from selected node
+  const categoryLabel = selected?.type === 'skill'
+    ? SKILL_GROUPS.find(g => selected.id.startsWith(`skill_${g.name}_`))?.name ?? null
+    : null;
+  const skillCount = selected?.type === 'category'
+    ? (SKILL_GROUPS.find(g => g.name === selected.label)?.items.length ?? 0)
+    : 0;
+
   return (
     <PageShell item={item} onBack={onBack} onNext={onNext} onPrev={onPrev}>
       <div className="relative h-full" style={{ minHeight: 0 }}>
+        {/* 3D graph canvas */}
         <div
           ref={containerRef}
           className="absolute"
-          style={{
-            inset: -GRAPH_BLEED,
-            zIndex: 1,
-          }}
+          style={{ inset: -GRAPH_BLEED, zIndex: 1 }}
         />
 
+        {/* Floating tooltip — position driven by rAF, content driven by React state */}
+        <div
+          ref={tooltipRef}
+          className="font-mono"
+          style={{
+            position: 'absolute',
+            zIndex: 10,
+            pointerEvents: 'none',
+            opacity: 0,
+            transition: 'opacity 180ms ease',
+            // centers horizontally on the node, floats above it
+            transform: 'translate(-50%, calc(-100% - 20px))',
+            background: 'rgba(4,10,26,0.95)',
+            border: `1px solid ${selected?.color ?? '#ffffff'}`,
+            padding: '9px 14px 10px',
+            backdropFilter: 'blur(14px)',
+            boxShadow: `0 8px 28px rgba(0,0,0,0.65), 0 0 16px ${selected?.color ?? '#ffffff'}1a`,
+            minWidth: 120,
+            whiteSpace: 'nowrap',
+          }}
+        >
+          {selected && (
+            <>
+              {/* Category breadcrumb for skill nodes */}
+              {categoryLabel && (
+                <div style={{
+                  fontSize: 9,
+                  letterSpacing: '0.24em',
+                  color: selected.color,
+                  opacity: 0.6,
+                  textTransform: 'uppercase',
+                  marginBottom: 5,
+                }}>
+                  {categoryLabel}
+                </div>
+              )}
+
+              {/* Node label */}
+              <div style={{
+                color: '#ffffff',
+                fontSize: 12,
+                fontWeight: 700,
+                letterSpacing: '0.1em',
+                textTransform: 'uppercase',
+              }}>
+                {selected.label}
+              </div>
+
+              {/* Rank badge */}
+              {selected.rank && (
+                <div style={{ display: 'flex', alignItems: 'center', gap: 7, marginTop: 7 }}>
+                  <span style={{ fontSize: 9, letterSpacing: '0.2em', opacity: 0.42, textTransform: 'uppercase' }}>
+                    rank
+                  </span>
+                  <span style={{
+                    fontSize: 10,
+                    padding: '1px 7px',
+                    background: `${selected.color}22`,
+                    border: `1px solid ${selected.color}70`,
+                    color: selected.color,
+                    letterSpacing: '0.14em',
+                  }}>
+                    {selected.rank}
+                  </span>
+                </div>
+              )}
+
+              {/* Skill count for category nodes */}
+              {selected.type === 'category' && skillCount > 0 && (
+                <div style={{
+                  fontSize: 9,
+                  letterSpacing: '0.2em',
+                  opacity: 0.42,
+                  marginTop: 6,
+                  textTransform: 'uppercase',
+                }}>
+                  {skillCount} skills
+                </div>
+              )}
+            </>
+          )}
+
+          {/* Arrow pointing down toward node */}
+          <div style={{
+            position: 'absolute',
+            bottom: -5,
+            left: '50%',
+            transform: 'translateX(-50%) rotate(45deg)',
+            width: 8,
+            height: 8,
+            background: 'rgba(4,10,26,0.95)',
+            borderRight: `1px solid ${selected?.color ?? '#ffffff'}`,
+            borderBottom: `1px solid ${selected?.color ?? '#ffffff'}`,
+          }} />
+        </div>
+
+        {/* Content layer */}
         <div className="relative flex h-full flex-col gap-4" style={{ zIndex: 3, pointerEvents: 'none', minHeight: 0 }}>
+          {/* Page title */}
           <div style={{ pointerEvents: 'auto', maxWidth: 'min(60%, 720px)' }}>
             <div className="font-mono uppercase" style={{ fontSize: 11, letterSpacing: '0.28em', opacity: 0.7 }}>
               skills.graph()
@@ -334,73 +429,136 @@ export function SkillsPage({ item, onBack, onNext, onPrev }: PageProps) {
                 top: 0,
                 right: 0,
                 bottom: 0,
-                width: 'min(320px, 32vw)',
+                width: 'min(272px, 30vw)',
                 overflowY: 'auto',
                 overscrollBehavior: 'contain',
-                padding: '18px 18px 22px',
-                background: 'rgba(5,12,32,0.6)',
-                border: '1px solid rgba(255,255,255,0.12)',
-                boxShadow: '0 20px 45px rgba(0,0,0,0.22)',
-                backdropFilter: 'blur(10px)',
+                paddingTop: 14,
+                paddingBottom: 22,
+                background: 'rgba(4,10,26,0.75)',
+                borderLeft: '1px solid rgba(255,255,255,0.07)',
+                borderTop: '1px solid rgba(255,255,255,0.07)',
+                borderBottom: '1px solid rgba(255,255,255,0.07)',
+                boxShadow: '-16px 0 48px rgba(0,0,0,0.35)',
+                backdropFilter: 'blur(16px)',
               }}
             >
-            <div style={{ fontSize: 11, letterSpacing: '0.24em', opacity: 0.55, marginBottom: 14 }}>
-              skill.index
-            </div>
-            <div className="flex flex-col" style={{ gap: 6 }}>
-              {SKILL_MENU_ENTRIES.map(entry => {
-                const isActive = selected?.id === entry.id;
+              {/* Header */}
+              <div style={{
+                fontSize: 9,
+                letterSpacing: '0.34em',
+                opacity: 0.35,
+                textTransform: 'uppercase',
+                color: '#fff',
+                padding: '0 16px 12px',
+                borderBottom: '1px solid rgba(255,255,255,0.06)',
+                marginBottom: 10,
+              }}>
+                // skill.index
+              </div>
 
-                return (
-                  <button
-                    key={entry.id}
-                    type="button"
-                    onClick={() => handleMenuSelect(entry.id)}
-                    className="text-left cursor-pointer"
-                    style={{
-                      background: isActive ? `${entry.color}22` : 'transparent',
-                      border: `1px solid ${isActive ? entry.color : 'transparent'}`,
-                      color: isActive ? '#ffffff' : '#d6def3',
-                      padding: entry.depth === 1 ? '10px 12px' : '8px 12px 8px 24px',
-                      letterSpacing: entry.depth === 1 ? '0.14em' : '0.08em',
-                      fontSize: entry.depth === 1 ? 12 : 11,
-                      textTransform: 'uppercase',
-                      transition: 'background 180ms ease, border-color 180ms ease, transform 180ms ease',
-                      transform: isActive ? 'translateX(-4px)' : 'translateX(0)',
-                    }}
-                  >
-                    <div style={{ color: entry.color }}>{entry.label}</div>
-                    {entry.rank && (
-                      <div style={{ fontSize: 10, letterSpacing: '0.18em', opacity: 0.62, marginTop: 4 }}>
-                        rank {entry.rank}
+              {/* Grouped skill list */}
+              <div style={{ display: 'flex', flexDirection: 'column' }}>
+                {SKILL_GROUPS.map((group, gi) => {
+                  const catId = `cat_${group.name}`;
+                  const isCatActive = selected?.id === catId;
+
+                  return (
+                    <div
+                      key={group.name}
+                      style={{ marginBottom: gi < SKILL_GROUPS.length - 1 ? 6 : 0 }}
+                    >
+                      {/* ── Category header ── */}
+                      <button
+                        type="button"
+                        onClick={() => handleMenuSelect(catId)}
+                        className="w-full text-left cursor-pointer"
+                        style={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: 8,
+                          padding: '9px 14px',
+                          background: isCatActive ? `${group.color}18` : 'transparent',
+                          borderLeft: `3px solid ${isCatActive ? group.color : `${group.color}40`}`,
+                          transition: 'background 180ms ease, border-color 180ms ease',
+                        }}
+                      >
+                        <span style={{
+                          flex: 1,
+                          color: isCatActive ? '#ffffff' : group.color,
+                          fontSize: 11,
+                          fontWeight: 700,
+                          letterSpacing: '0.22em',
+                          textTransform: 'uppercase',
+                          transition: 'color 180ms ease',
+                        }}>
+                          {group.name}
+                        </span>
+                        {/* Skill count badge */}
+                        <span style={{
+                          fontSize: 9,
+                          letterSpacing: '0.1em',
+                          padding: '1px 5px',
+                          background: `${group.color}18`,
+                          border: `1px solid ${group.color}38`,
+                          color: `${group.color}90`,
+                          flexShrink: 0,
+                        }}>
+                          {group.items.length}
+                        </span>
+                      </button>
+
+                      {/* ── Skill items ── */}
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: 1, padding: '3px 0' }}>
+                        {group.items.map(([name, rank]) => {
+                          const skillId = `skill_${group.name}_${name}`;
+                          const isActive = selected?.id === skillId;
+
+                          return (
+                            <button
+                              key={skillId}
+                              type="button"
+                              onClick={() => handleMenuSelect(skillId)}
+                              className="w-full text-left cursor-pointer"
+                              style={{
+                                display: 'flex',
+                                justifyContent: 'space-between',
+                                alignItems: 'center',
+                                padding: '5px 14px 5px 22px',
+                                background: isActive ? `${group.color}14` : 'transparent',
+                                borderLeft: `2px solid ${isActive ? group.color : 'transparent'}`,
+                                transition: 'background 140ms ease, border-color 140ms ease',
+                              }}
+                            >
+                              <span style={{
+                                color: isActive ? '#ffffff' : 'rgba(165,185,225,0.65)',
+                                fontSize: 10,
+                                letterSpacing: '0.1em',
+                                textTransform: 'uppercase',
+                                transition: 'color 140ms ease',
+                              }}>
+                                {name}
+                              </span>
+                              <span style={{
+                                fontSize: 9,
+                                padding: '1px 5px',
+                                background: isActive ? `${group.color}28` : `${group.color}10`,
+                                border: `1px solid ${isActive ? `${group.color}65` : `${group.color}28`}`,
+                                color: isActive ? group.color : `${group.color}70`,
+                                letterSpacing: '0.12em',
+                                flexShrink: 0,
+                                transition: 'all 140ms ease',
+                              }}>
+                                {rank}
+                              </span>
+                            </button>
+                          );
+                        })}
                       </div>
-                    )}
-                  </button>
-                );
-              })}
-            </div>
+                    </div>
+                  );
+                })}
+              </div>
             </aside>
-          </div>
-
-          <div
-            className="font-mono"
-            style={{
-              pointerEvents: 'none',
-              alignSelf: 'center',
-              background: selected ? 'rgba(5,12,32,0.85)' : 'transparent',
-              border: `1px solid ${selected ? selected.color : 'transparent'}`,
-              padding: '8px 20px',
-              letterSpacing: '0.12em',
-              backdropFilter: selected ? 'blur(8px)' : 'none',
-              visibility: selected ? 'visible' : 'hidden',
-            }}
-          >
-            <span style={{ color: selected?.color, fontSize: 13 }}>{selected?.label ?? '\u00A0'}</span>
-            {selected?.rank && (
-              <span style={{ marginLeft: 14, fontSize: 11, opacity: 0.7 }}>
-                RANK · <span style={{ color: selected.color }}>{selected.rank}</span>
-              </span>
-            )}
           </div>
 
           <div className="font-mono uppercase" style={{ fontSize: 10, letterSpacing: '0.18em', opacity: 0.45, pointerEvents: 'none' }}>
