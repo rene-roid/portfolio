@@ -154,7 +154,7 @@ export default function App() {
   const pendingRef = useRef<string | null>(null);
   const isProjectDetailRef = useRef(false);
 
-  const CHARGE_THRESHOLD = 620;
+  const CHARGE_THRESHOLD = 420;
 
   useEffect(() => { audioPlayer.init(); }, []);
 
