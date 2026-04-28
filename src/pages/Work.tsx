@@ -75,7 +75,7 @@ export function WorkPage({ item, onBack }: { item: MenuItem; onBack: () => void 
 
           <div className="grid gap-4 items-start" style={{ marginTop: 18, gridTemplateColumns: '1fr 1fr' }}>
             <p className="font-body" style={{ fontSize: 16, lineHeight: 1.55, color: '#d9e6ff' }}>
-              {active.desc}
+              {/* {active.desc} */}
             </p>
             <div className="flex flex-wrap gap-2 justify-end">
               {['Case study', 'Live site', 'Repository'].map(l => (
