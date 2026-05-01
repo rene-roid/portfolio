@@ -413,7 +413,7 @@ export function NowPlayingPlayer({ label, value, accent }: {
   value: string;
   accent: string;
 }) {
-  const { playing, volume, toggle, setVolume } = useAudioPlayer();
+  const { playing, volume, muted, toggle, setVolume, toggleMute } = useAudioPlayer();
 
   function onVolumeChange(e: React.ChangeEvent<HTMLInputElement>) {
     e.stopPropagation();
@@ -464,11 +464,27 @@ export function NowPlayingPlayer({ label, value, accent }: {
 
       {/* Volume row */}
       <div className="flex items-center gap-2" style={{ marginTop: 2 }}>
-        <svg width="11" height="11" viewBox="0 0 11 11" fill="none" style={{ flexShrink: 0, opacity: 0.6 }}>
-          <polygon points="0,3 4,3 7,0 7,11 4,8 0,8" fill="currentColor" />
-          {volume > 0.05 && <path d="M8.5 3.5 Q10.5 5.5 8.5 7.5" stroke="currentColor" strokeWidth="1.2" fill="none" strokeLinecap="round" />}
-          {volume > 0.5 && <path d="M9.5 1.5 Q12.5 5.5 9.5 9.5" stroke="currentColor" strokeWidth="1.2" fill="none" strokeLinecap="round" />}
-        </svg>
+        <button
+          onClick={toggleMute}
+          style={{ background: 'none', border: 'none', padding: 0, cursor: 'pointer', flexShrink: 0, display: 'flex', alignItems: 'center', opacity: 0.6 }}
+          title={muted ? 'Unmute' : 'Mute'}
+        >
+          <svg width="11" height="11" viewBox="0 0 11 11" fill="none">
+            <polygon points="0,3 4,3 7,0 7,11 4,8 0,8" fill="currentColor" />
+            {muted ? (
+              // X lines for mute icon
+              <>
+                <line x1="8" y1="3" x2="11" y2="8" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" />
+                <line x1="11" y1="3" x2="8" y2="8" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" />
+              </>
+            ) : (
+              <>
+                {volume > 0.05 && <path d="M8.5 3.5 Q10.5 5.5 8.5 7.5" stroke="currentColor" strokeWidth="1.2" fill="none" strokeLinecap="round" />}
+                {volume > 0.5  && <path d="M9.5 1.5 Q12.5 5.5 9.5 9.5" stroke="currentColor" strokeWidth="1.2" fill="none" strokeLinecap="round" />}
+              </>
+            )}
+          </svg>
+        </button>
         <div className="relative flex items-center" style={{ flex: 1, height: 16 }}>
           <div style={{ position: 'absolute', left: 0, right: 0, height: 1.5, background: 'rgba(255,255,255,0.15)' }}>
             <div style={{ width: `${volume * 100}%`, height: '100%', background: accent }} />
