@@ -1,5 +1,8 @@
 import type { MenuItem } from './types';
 
+// flip to true when projects are ready to show
+export const PROJECTS_LIVE = false;
+
 export const MENU_ITEMS: MenuItem[] = [
   { id: 'about',   label: 'ABOUT ME',   sub: 'The Developer',   color: '#ff3b8a', hue: 'crimson', transition: 'slash',  command: 'PROFILE' },
   { id: 'experience', label: 'EXPERIENCE', sub: 'The Résumé',     color: '#a56bff', hue: 'violet',  transition: 'bars',   command: 'EXPERIENCE' },
@@ -116,13 +119,13 @@ export const EXPERIENCE = {
   jobs: [
     {
       role: 'Full Stack Developer',
-      company: 'INFINI',
+      company: 'Forvis Mazars',
       start: '2023-01',
       end: null, // current
       desc: 'Building custom client-facing web applications from scratch. Owning the full product cycle: frontend (React, Next.js, TypeScript) and backend (Node.js, C#).',
       accent: '#c6ff3d',
       coding: true,
-      url: "https://www.linkedin.com/company/infiniai/",
+      url: "https://www.linkedin.com/company/forvismazars/",
     },
     {
       role: 'Game Dev Intern',
@@ -171,24 +174,24 @@ export const SKILL_GROUPS = [
   {
     name: 'FRONTEND',
     color: '#ffd23f',
-    items: [['React', 'S+'], ['Next.js', 'S+'], ['TypeScript', 'S+'], ['CSS / Tailwind', 'S']]
+    items: [['React', 'daily driver'], ['Next.js', '3 prod apps'], ['TypeScript', 'strict always'], ['CSS / Tailwind', 'built this site']]
   },
   {
     name: 'BACKEND',
     color: '#4fd6ff',
-    items: [['Node.js / Express', 'A'], ['C# / .NET', 'B+'], ['FastAPI', 'B'], ['Django', 'B']]
+    items: [['Node.js / Express', 'REST at Forvis Mazars'], ['C# / .NET', 'Unity + backend'], ['FastAPI', 'Python APIs'], ['Django', 'ORM fluent']]
   },
   {
     name: 'DATA',
     color: '#ff3b8a',
-    items: [['SQL', 'A'], ['MySQL / MariaDB', 'A'], ['PostgreSQL', 'B'], ['Database Design', 'A']]
+    items: [['SQL', 'write it daily'], ['MySQL / MariaDB', "Forvis Mazars' DB"], ['PostgreSQL', 'side projects'], ['Database Design', 'schema-first']]
   },
   {
     name: 'GAME DEV',
     color: '#a56bff',
-    items: [['Unity', 'B+'], ['C# (Game)', 'B+'], ['Java', 'B'], ['Game Architecture', 'B']]
+    items: [['Unity', 'VR / AR titles'], ['C# (Game)', 'custom physics'], ['Java', 'uni + hobby'], ['Game Architecture', 'ECS patterns']]
   },
-  {name: 'INFRA', color: '#c6ff3d', items: [['Git', 'S'], ['CI/CD', 'A'], ['DevOps', 'B'], ['Agile', 'A']]},
+  {name: 'INFRA', color: '#c6ff3d', items: [['Git', 'rebase > merge'], ['CI/CD', 'GH Actions'], ['DevOps', 'Docker + cloud'], ['Agile', 'sprint daily']]},
 ];
 
 export const POSTS = [

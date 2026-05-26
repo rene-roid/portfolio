@@ -34,6 +34,8 @@ function AudioVisualizer({ analyser, colorRef }: {
     const peaks = new Float32Array(analyser.frequencyBinCount);
     const bars = new Float32Array(analyser.frequencyBinCount);
     let frameId: number;
+    let lastTime = 0;
+    const FRAME_MS = 1000 / 30;
 
     function resize() {
       if (!canvas) return;
@@ -44,8 +46,10 @@ function AudioVisualizer({ analyser, colorRef }: {
     const ro = new ResizeObserver(resize);
     ro.observe(canvas);
 
-    function draw() {
+    function draw(now = 0) {
       frameId = requestAnimationFrame(draw);
+      if (now - lastTime < FRAME_MS) return;
+      lastTime = now;
       analyser.getByteFrequencyData(bins);
 
       if (!canvas) return;
@@ -55,10 +59,11 @@ function AudioVisualizer({ analyser, colorRef }: {
 
       const [r, g, b] = hexToRgb(colorRef.current);
       const skip = 3;
-      const count = Math.min(bins.length, 80);
+      const count = Math.min(bins.length, 60);
       const barW = w / (count - skip);
       const maxBarH = h * 0.28;
 
+      ctx.fillStyle = `rgba(${r},${g},${b},0.65)`;
       for (let i = skip; i < count; i++) {
         const v = bins[i] / 255;
         peaks[i] = Math.max(peaks[i] * 0.97, v);
@@ -66,12 +71,7 @@ function AudioVisualizer({ analyser, colorRef }: {
         const bh = bars[i] * maxBarH;
         if (bh < 1) continue;
         const x = (i - skip) * barW;
-        const y = h - bh;
-        const grad = ctx.createLinearGradient(x, y, x, h);
-        grad.addColorStop(0, `rgba(${r},${g},${b},0.75)`);
-        grad.addColorStop(1, `rgba(${r},${g},${b},0.03)`);
-        ctx.fillStyle = grad;
-        ctx.fillRect(x + 0.5, y, Math.max(barW - 1.5, 1), bh);
+        ctx.fillRect(x + 0.5, h - bh, Math.max(barW - 1.5, 1), bh);
       }
 
       // Bass radial glow
@@ -85,10 +85,17 @@ function AudioVisualizer({ analyser, colorRef }: {
       }
     }
 
+    function onVisibilityChange() {
+      if (document.hidden) cancelAnimationFrame(frameId);
+      else draw();
+    }
+    document.addEventListener('visibilitychange', onVisibilityChange);
+
     draw();
     return () => {
       cancelAnimationFrame(frameId);
       ro.disconnect();
+      document.removeEventListener('visibilitychange', onVisibilityChange);
     };
   }, [analyser, colorRef]);
 
@@ -124,17 +131,19 @@ function ParticleNetwork({ colorRef }: { colorRef: { current: string } }) {
     let mouseX = -9999, mouseY = -9999;
 
     const MOUSE_RADIUS = 160;
+    const MOUSE_RADIUS_SQ = MOUSE_RADIUS * MOUSE_RADIUS;
     const ORBIT_RADIUS = 72;
     const TANGENTIAL = 0.062;
     const RADIAL_SPRING = 0.018;
     const DECAY = 0.89;
     const MAX_DIST = 140;
+    const MAX_DIST_SQ = MAX_DIST * MAX_DIST;
 
     function resize() {
       if (!canvas) return;
       w = canvas.width = canvas.offsetWidth;
       h = canvas.height = canvas.offsetHeight;
-      const count = Math.floor((w * h) / 14000);
+      const count = Math.min(Math.floor((w * h) / 18000), 80);
       particles = Array.from({ length: count }, () => ({
         x: Math.random() * w,
         y: Math.random() * h,
@@ -171,30 +180,40 @@ function ParticleNetwork({ colorRef }: { colorRef: { current: string } }) {
     }
     window.addEventListener('click', onClick);
 
-    function draw() {
+    let cachedHex = '';
+    let cr = 79, cg = 214, cb = 255;
+    let lastTime = 0;
+    const FRAME_MS = 1000 / 30;
+
+    function draw(now = 0) {
       frameId = requestAnimationFrame(draw);
+      if (now - lastTime < FRAME_MS) return;
+      lastTime = now;
       ctx.clearRect(0, 0, w, h);
 
       const hex = colorRef.current;
-      const hh = hex.replace('#', '');
-      const r = parseInt(hh.slice(0, 2), 16) || 79;
-      const g = parseInt(hh.slice(2, 4), 16) || 214;
-      const b = parseInt(hh.slice(4, 6), 16) || 255;
+      if (hex !== cachedHex) {
+        cachedHex = hex;
+        const hh = hex.replace('#', '');
+        cr = parseInt(hh.slice(0, 2), 16) || 79;
+        cg = parseInt(hh.slice(2, 4), 16) || 214;
+        cb = parseInt(hh.slice(4, 6), 16) || 255;
+      }
+      const r = cr, g = cg, b = cb;
 
       for (const p of particles) {
         const dx = mouseX - p.x;
         const dy = mouseY - p.y;
-        const dist = Math.sqrt(dx * dx + dy * dy);
-        if (dist < MOUSE_RADIUS && dist > 1) {
+        const distSq = dx * dx + dy * dy;
+        if (distSq < MOUSE_RADIUS_SQ && distSq > 1) {
+          const dist = Math.sqrt(distSq);
           const rx = dx / dist;
           const ry = dy / dist;
-          // tangential (perpendicular) force — creates orbit
           const tx = -ry * p.orbitDir;
           const ty =  rx * p.orbitDir;
           const tStr = TANGENTIAL * (1 - dist / MOUSE_RADIUS);
           p.ex += tx * tStr;
           p.ey += ty * tStr;
-          // radial spring — pulls toward ORBIT_RADIUS distance
           const spring = RADIAL_SPRING * (dist - ORBIT_RADIUS) / ORBIT_RADIUS;
           p.ex += rx * spring;
           p.ey += ry * spring;
@@ -210,13 +229,14 @@ function ParticleNetwork({ colorRef }: { colorRef: { current: string } }) {
         if (p.y > h) p.y -= h;
       }
 
-      // particle–particle lines
+      // particle–particle lines — O(n²) with squared-distance early exit
       for (let i = 0; i < particles.length; i++) {
         for (let j = i + 1; j < particles.length; j++) {
           const dx = particles[i].x - particles[j].x;
           const dy = particles[i].y - particles[j].y;
-          const dist = Math.sqrt(dx * dx + dy * dy);
-          if (dist < MAX_DIST) {
+          const distSq = dx * dx + dy * dy;
+          if (distSq < MAX_DIST_SQ) {
+            const dist = Math.sqrt(distSq);
             const alpha = (1 - dist / MAX_DIST) * 0.22;
             ctx.beginPath();
             ctx.moveTo(particles[i].x, particles[i].y);
@@ -233,8 +253,9 @@ function ParticleNetwork({ colorRef }: { colorRef: { current: string } }) {
         for (const p of particles) {
           const dx = mouseX - p.x;
           const dy = mouseY - p.y;
-          const dist = Math.sqrt(dx * dx + dy * dy);
-          if (dist < MOUSE_RADIUS) {
+          const distSq = dx * dx + dy * dy;
+          if (distSq < MOUSE_RADIUS_SQ) {
+            const dist = Math.sqrt(distSq);
             const t = 1 - dist / MOUSE_RADIUS;
             const alpha = t * 0.55;
             const lw = 0.5 + t * 1.2;
@@ -251,14 +272,17 @@ function ParticleNetwork({ colorRef }: { colorRef: { current: string } }) {
       // ripple physics + drawing
       for (const rip of ripples) {
         rip.radius += RIPPLE_SPEED;
+        const ripInnerSq = Math.max(0, rip.radius - RING_WIDTH) ** 2;
+        const ripOuterSq = (rip.radius + RING_WIDTH * 0.5) ** 2;
 
-        // push particles as ring front passes through them
         for (const p of particles) {
           const dx = p.x - rip.x;
           const dy = p.y - rip.y;
-          const dist = Math.sqrt(dx * dx + dy * dy);
+          const distSq = dx * dx + dy * dy;
+          if (distSq < ripInnerSq || distSq > ripOuterSq) continue;
+          const dist = Math.sqrt(distSq);
           const delta = dist - rip.radius;
-          if (delta > -RING_WIDTH && delta < RING_WIDTH * 0.5 && dist > 0) {
+          if (dist > 0) {
             const envelope = 1 - Math.abs(delta) / RING_WIDTH;
             const force = envelope * PUSH_FORCE;
             p.ex += (dx / dist) * force;
@@ -266,7 +290,6 @@ function ParticleNetwork({ colorRef }: { colorRef: { current: string } }) {
           }
         }
 
-        // draw outer ring
         const t = rip.radius / RIPPLE_MAX;
         const alpha = (1 - t) * 0.65;
         ctx.beginPath();
@@ -275,7 +298,6 @@ function ParticleNetwork({ colorRef }: { colorRef: { current: string } }) {
         ctx.lineWidth = 1.5 * (1 - t) + 0.5;
         ctx.stroke();
 
-        // draw trailing inner ring (secondary water drop wave)
         const r2 = rip.radius * 0.62;
         const t2 = r2 / RIPPLE_MAX;
         const a2 = (1 - t2) * 0.3;
@@ -287,7 +309,6 @@ function ParticleNetwork({ colorRef }: { colorRef: { current: string } }) {
       }
       ripples = ripples.filter(rip => rip.radius < RIPPLE_MAX);
 
-      // particles
       for (const p of particles) {
         const speed = Math.sqrt(p.ex * p.ex + p.ey * p.ey);
         const boost = Math.min(speed * 4, 1);
@@ -298,6 +319,12 @@ function ParticleNetwork({ colorRef }: { colorRef: { current: string } }) {
       }
     }
 
+    function onVisibilityChange() {
+      if (document.hidden) cancelAnimationFrame(frameId);
+      else draw();
+    }
+    document.addEventListener('visibilitychange', onVisibilityChange);
+
     draw();
     return () => {
       cancelAnimationFrame(frameId);
@@ -305,6 +332,7 @@ function ParticleNetwork({ colorRef }: { colorRef: { current: string } }) {
       window.removeEventListener('mousemove', onMouseMove);
       window.removeEventListener('mouseleave', onMouseLeave);
       window.removeEventListener('click', onClick);
+      document.removeEventListener('visibilitychange', onVisibilityChange);
     };
   }, [colorRef]);
 

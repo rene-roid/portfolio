@@ -118,7 +118,7 @@ export function AboutPage({ item, onBack, onNext, onPrev }: PageProps) {
         <div className="flex flex-col gap-4 justify-center">
           <StyledCard accent="#c6ff3d">
             <div className="font-mono uppercase" style={{ fontSize: 10, letterSpacing: '0.28em', opacity: 0.6 }}>CURRENTLY</div>
-            <div className="font-display italic" style={{ fontSize: 26, marginTop: 6 }}>Full Stack Dev · INFINI</div>
+            <div className="font-display italic" style={{ fontSize: 26, marginTop: 6 }}>Full Stack Dev · Forvis Mazars</div>
             <div style={{ opacity: 0.7, marginTop: 4, fontSize: 14 }}>Building custom client-facing web tools from scratch.</div>
           </StyledCard>
           <StyledCard accent="#ff4141">

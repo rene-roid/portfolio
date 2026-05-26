@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import type { ReactNode, CSSProperties } from 'react';
-import { MENU_ITEMS, PROJECTS, EXPERIENCE, SKILL_GROUPS } from '../data';
+import { MENU_ITEMS, PROJECTS, EXPERIENCE, SKILL_GROUPS, PROJECTS_LIVE } from '../data';
 import type { Project } from '../data';
 import { MarkdownRenderer } from './MarkdownRenderer';
 import {
@@ -315,7 +315,7 @@ function MobileAbout() {
             CURRENTLY
           </div>
           <div style={{ fontFamily: "'Archivo Black', sans-serif", fontStyle: 'italic', fontSize: 19 }}>
-            Full Stack Dev · INFINI
+            Full Stack Dev · Forvis Mazars
           </div>
           <div style={{ fontSize: 13, opacity: 0.7, marginTop: 4, fontFamily: 'Archivo, sans-serif' }}>
             Building custom client-facing web tools from scratch.
@@ -698,6 +698,13 @@ function MobileProjects() {
   const item = MENU_ITEMS.find((m) => m.id === 'projects')!;
   const c = item.color;
   const [expandedId, setExpandedId] = useState<string | null>(null);
+  const [blink, setBlink] = useState(true);
+
+  useEffect(() => {
+    if (PROJECTS_LIVE) return;
+    const id = setInterval(() => setBlink((b) => !b), 600);
+    return () => clearInterval(id);
+  }, []);
 
   function toggle(id: string) {
     setExpandedId((prev) => (prev === id ? null : id));
@@ -711,16 +718,41 @@ function MobileProjects() {
         <span style={{ color: c, textShadow: '3px 3px 0 #fff' }}>PROJECTS</span>
       </SectionHeading>
 
-      <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-        {PROJECTS.map((project) => (
-          <MobileProjectCard
-            key={project.id}
-            project={project}
-            expanded={expandedId === project.id}
-            onToggle={() => toggle(project.id)}
-          />
-        ))}
-      </div>
+      {PROJECTS_LIVE ? (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+          {PROJECTS.map((project) => (
+            <MobileProjectCard
+              key={project.id}
+              project={project}
+              expanded={expandedId === project.id}
+              onToggle={() => toggle(project.id)}
+            />
+          ))}
+        </div>
+      ) : (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+          <div style={{
+            fontFamily: 'JetBrains Mono, monospace', fontSize: 12,
+            color: c, letterSpacing: '0.08em',
+            display: 'flex', alignItems: 'center', gap: 10,
+          }}>
+            <span style={{
+              display: 'inline-block', width: 9, height: 9,
+              borderRadius: '50%', background: c,
+              opacity: blink ? 1 : 0.2, transition: 'opacity 200ms',
+            }} />
+            STATUS: IN PROGRESS
+          </div>
+          <div style={{
+            fontFamily: 'JetBrains Mono, monospace', fontSize: 12,
+            opacity: 0.5, lineHeight: 1.9,
+          }}>
+            {'>'} cooking something up...<br />
+            {'>'} ETA: when it&apos;s done™<br />
+            {'>'} <span style={{ opacity: blink ? 1 : 0 }}>█</span>
+          </div>
+        </div>
+      )}
     </MobileSection>
   );
 }

@@ -10,7 +10,7 @@ import { PageShell } from '../components/PageShell';
 interface GraphNode {
   id: string;
   label: string;
-  rank?: string;
+  note?: string;
   color: string;
   type: 'center' | 'category' | 'skill';
   depth: number;
@@ -40,9 +40,9 @@ function buildGraph() {
     nodes.push({ id: catId, label: g.name, color: g.color, type: 'category', depth: 1, nodeSize: 9 });
     links.push({ source: 'root', target: catId, linkColor: `${g.color}66` });
 
-    for (const [name, rank] of g.items) {
+    for (const [name, note] of g.items) {
       const skillId = `skill_${g.name}_${name}`;
-      nodes.push({ id: skillId, label: name, rank, color: g.color, type: 'skill', depth: 2, nodeSize: 5 });
+      nodes.push({ id: skillId, label: name, note, color: g.color, type: 'skill', depth: 2, nodeSize: 5 });
       links.push({ source: catId, target: skillId, linkColor: `${g.color}44` });
     }
   }
@@ -78,7 +78,7 @@ function makeNodeObject(node: GraphNode) {
   const isCategory = node.type === 'category';
   const isCenter = node.type === 'center';
   canvas.width = isCenter ? 300 : isCategory ? 340 : 280;
-  canvas.height = node.rank ? 72 : 56;
+  canvas.height = node.note ? 72 : 56;
   const ctx = canvas.getContext('2d')!;
   ctx.clearRect(0, 0, canvas.width, canvas.height);
 
@@ -87,12 +87,12 @@ function makeNodeObject(node: GraphNode) {
   ctx.fillStyle = node.color;
   ctx.textAlign = 'center';
   ctx.textBaseline = 'middle';
-  ctx.fillText(node.label, canvas.width / 2, node.rank ? canvas.height / 2 - 10 : canvas.height / 2);
+  ctx.fillText(node.label, canvas.width / 2, node.note ? canvas.height / 2 - 10 : canvas.height / 2);
 
-  if (node.rank) {
+  if (node.note) {
     ctx.font = '16px monospace';
     ctx.fillStyle = `${node.color}bb`;
-    ctx.fillText(node.rank, canvas.width / 2, canvas.height / 2 + 16);
+    ctx.fillText(node.note, canvas.width / 2, canvas.height / 2 + 16);
   }
 
   const tex = new THREE.CanvasTexture(canvas);
@@ -354,21 +354,19 @@ export function SkillsPage({ item, onBack, onNext, onPrev }: PageProps) {
                 {selected.label}
               </div>
 
-              {/* Rank badge */}
-              {selected.rank && (
-                <div style={{ display: 'flex', alignItems: 'center', gap: 7, marginTop: 7 }}>
-                  <span style={{ fontSize: 9, letterSpacing: '0.2em', opacity: 0.42, textTransform: 'uppercase' }}>
-                    rank
-                  </span>
+              {/* Note tag */}
+              {selected.note && (
+                <div style={{ marginTop: 7 }}>
                   <span style={{
-                    fontSize: 10,
-                    padding: '1px 7px',
+                    fontSize: 9,
+                    padding: '2px 7px',
                     background: `${selected.color}22`,
                     border: `1px solid ${selected.color}70`,
                     color: selected.color,
-                    letterSpacing: '0.14em',
+                    letterSpacing: '0.12em',
+                    textTransform: 'lowercase',
                   }}>
-                    {selected.rank}
+                    {selected.note}
                   </span>
                 </div>
               )}
@@ -509,7 +507,7 @@ export function SkillsPage({ item, onBack, onNext, onPrev }: PageProps) {
 
                       {/* ── Skill items ── */}
                       <div style={{ display: 'flex', flexDirection: 'column', gap: 1, padding: '3px 0' }}>
-                        {group.items.map(([name, rank]) => {
+                        {group.items.map(([name, note]) => {
                           const skillId = `skill_${group.name}_${name}`;
                           const isActive = selected?.id === skillId;
 
@@ -521,8 +519,9 @@ export function SkillsPage({ item, onBack, onNext, onPrev }: PageProps) {
                               className="w-full text-left cursor-pointer"
                               style={{
                                 display: 'flex',
-                                justifyContent: 'space-between',
-                                alignItems: 'center',
+                                flexDirection: 'column',
+                                alignItems: 'flex-start',
+                                gap: 2,
                                 padding: '5px 14px 5px 22px',
                                 background: isActive ? `${group.color}14` : 'transparent',
                                 borderLeft: `2px solid ${isActive ? group.color : 'transparent'}`,
@@ -540,15 +539,11 @@ export function SkillsPage({ item, onBack, onNext, onPrev }: PageProps) {
                               </span>
                               <span style={{
                                 fontSize: 9,
-                                padding: '1px 5px',
-                                background: isActive ? `${group.color}28` : `${group.color}10`,
-                                border: `1px solid ${isActive ? `${group.color}65` : `${group.color}28`}`,
                                 color: isActive ? group.color : `${group.color}70`,
-                                letterSpacing: '0.12em',
-                                flexShrink: 0,
-                                transition: 'all 140ms ease',
+                                letterSpacing: '0.08em',
+                                transition: 'color 140ms ease',
                               }}>
-                                {rank}
+                                {note}
                               </span>
                             </button>
                           );

@@ -2,12 +2,59 @@ import {useState, useMemo, useEffect, useRef, useCallback} from 'react';
 import type {ReactNode, CSSProperties} from 'react';
 import {useNavigate, useLocation} from 'react-router-dom';
 import type {PageProps} from '../types';
-import {PROJECTS, PROJECT_CATEGORIES} from '../data';
+import {PROJECTS, PROJECT_CATEGORIES, PROJECTS_LIVE} from '../data';
 import type {Project, ProjectCategory} from '../data';
 import {PageShell} from '../components/PageShell';
 import {MarkdownRenderer} from '../components/MarkdownRenderer';
 
 const mdModules = import.meta.glob('../content/projects/*.md', { query: '?raw', import: 'default' });
+
+function ProjectsWip({accent}: {accent: string}) {
+  const [blink, setBlink] = useState(true);
+  useEffect(() => {
+    const id = setInterval(() => setBlink(b => !b), 600);
+    return () => clearInterval(id);
+  }, []);
+  return (
+    <div style={{
+      display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'flex-start',
+      height: '100%', gap: 20, paddingLeft: 4,
+    }}>
+      <div style={{
+        fontFamily: 'JetBrains Mono, monospace', fontSize: 11,
+        letterSpacing: '0.28em', textTransform: 'uppercase', opacity: 0.7,
+      }}>projects.load()</div>
+      <div style={{
+        fontFamily: "'Archivo Black', sans-serif", fontStyle: 'italic',
+        fontSize: 'clamp(36px, 4vw, 58px)', lineHeight: 0.9,
+        letterSpacing: '-0.03em', transform: 'skewX(-6deg)',
+        color: '#fff', textShadow: `4px 4px 0 ${accent}`,
+      }}>
+        MY <span style={{color: accent, textShadow: '4px 4px 0 #fff'}}>PROJECTS</span>
+      </div>
+      <div style={{
+        fontFamily: 'JetBrains Mono, monospace', fontSize: 13,
+        color: accent, letterSpacing: '0.08em',
+        display: 'flex', alignItems: 'center', gap: 10,
+      }}>
+        <span style={{
+          display: 'inline-block', width: 10, height: 10,
+          borderRadius: '50%', background: accent,
+          opacity: blink ? 1 : 0.2, transition: 'opacity 200ms',
+        }} />
+        STATUS: IN PROGRESS
+      </div>
+      <div style={{
+        fontFamily: 'JetBrains Mono, monospace', fontSize: 12,
+        opacity: 0.5, maxWidth: 420, lineHeight: 1.8,
+      }}>
+        {'>'} cooking something up...<br />
+        {'>'} ETA: when it&apos;s done™<br />
+        {'>'} <span style={{opacity: blink ? 1 : 0}}>█</span>
+      </div>
+    </div>
+  );
+}
 
 function FadeIn({children, style}: {children: ReactNode; style?: CSSProperties}) {
   const [on, setOn] = useState(false);
@@ -57,7 +104,7 @@ export function ProjectsPage({item, onBack, onNext, onPrev}: PageProps) {
         <FadeIn key={`detail-${open.id}`} style={{overflow: 'hidden'}}>
           <ProjectDetail project={open} onClose={closeDetail} />
         </FadeIn>
-      ) : (
+      ) : PROJECTS_LIVE ? (
         <FadeIn key="grid" style={{overflow: 'hidden'}}>
           <div style={{display: 'flex', flexDirection: 'column', gap: 14, height: '100%', overflow: 'hidden'}}>
             <div>
@@ -86,6 +133,10 @@ export function ProjectsPage({item, onBack, onNext, onPrev}: PageProps) {
               <ProjectGrid items={filtered} onOpen={(id) => navigate(`/projects/${id}`)} />
             </div>
           </div>
+        </FadeIn>
+      ) : (
+        <FadeIn key="wip" style={{overflow: 'hidden'}}>
+          <ProjectsWip accent={item.color} />
         </FadeIn>
       )}
     </PageShell>

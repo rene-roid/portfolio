@@ -66,8 +66,11 @@ class AudioPlayerSingleton {
 
     audio.addEventListener('timeupdate', () => {
       if (audio.duration) {
-        this._progress = audio.currentTime / audio.duration;
-        this.notify();
+        const p = audio.currentTime / audio.duration;
+        if (Math.abs(p - this._progress) > 0.005) {
+          this._progress = p;
+          this.notify();
+        }
       }
     });
 
