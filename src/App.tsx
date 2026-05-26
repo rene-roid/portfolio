@@ -4,12 +4,14 @@ import { MENU_ITEMS } from './data';
 import type { PageProps, TransitionPhase } from './types';
 import { MainMenu } from './components/Menu';
 import { Transition } from './components/Transitions';
+import { MobileLayout } from './components/MobileLayout';
 import { audioPlayer } from './audioPlayer';
 import { AboutPage } from './pages/About';
 import { ExperiencePage } from './pages/Experience';
 import { SkillsPage } from './pages/Skills';
 import { ProjectsPage } from './pages/Projects';
 import { ContactPage } from './pages/Contact';
+import { useMediaQuery } from './hooks/useMediaQuery';
 
 function ScrollHint({ canScroll, color, hidden }: {
   canScroll: boolean;
@@ -136,6 +138,17 @@ const PAGES: Record<string, React.ComponentType<PageProps>> = {
 const NAV_ORDER = ['menu', 'about', 'experience', 'projects', 'skills', 'contact'];
 
 export default function App() {
+  const isMobile = useMediaQuery('(max-width: 767px)');
+
+  // Render mobile scroll layout on small screens — no transitions, no wheel nav
+  if (isMobile) {
+    return <MobileLayout />;
+  }
+
+  return <DesktopApp />;
+}
+
+function DesktopApp() {
   const navigate = useNavigate();
   const location = useLocation();
   const [pending, setPending] = useState<string | null>(null);

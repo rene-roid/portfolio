@@ -85,6 +85,16 @@ html, body, #root {
   -webkit-font-smoothing: antialiased;
 }
 
+/* Mobile: allow vertical scrolling, release fixed height */
+@media (max-width: 767px) {
+  html, body, #root {
+    height: auto;
+    min-height: 100%;
+    overflow-x: hidden;
+    overflow-y: auto;
+  }
+}
+
 @keyframes fragmentBlink {
   50% { opacity: 0; }
 }
