@@ -25,4 +25,4 @@ Given more time I'd add a custom chart editor so level designers can author obst
 
 <!-- Image here -->
 ## Image
-![Screenshot of the rhythm game showing the player character dodging an obstacle in sync with the beat. The UI displays the current combo multiplier and score.](/public/projects/dio_fight.gif)
+![Screenshot of the rhythm game showing the player character dodging an obstacle in sync with the beat. The UI displays the current combo multiplier and score.](/portfolio/projects/dio_fight.gif)

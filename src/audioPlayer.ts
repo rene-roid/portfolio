@@ -59,7 +59,7 @@ class AudioPlayerSingleton {
     // Restore persisted volume immediately
     const { volume, playing } = useAudioStore.getState();
 
-    const audio = new Audio('/MusicMenu%20Update.mp3');
+    const audio = new Audio(import.meta.env.BASE_URL + 'MusicMenu%20Update.mp3');
     audio.loop = true;
     audio.volume = 1; // gain node controls actual volume
     this.audio = audio;

@@ -109,7 +109,7 @@ function IntroPanel({ hoveredItem }: { hoveredItem: MenuItem | null }) {
 }
 
 // ── Menu item row ─────────────────────────────────────────────────────────
-const hoverSfx = new Audio('/hovertft.mp3');
+const hoverSfx = new Audio(import.meta.env.BASE_URL + 'hovertft.mp3');
 hoverSfx.volume = 0.4;
 
 function MenuItemRow({ item, index, isActive, onHover, onClick, menuReady = false }: {
